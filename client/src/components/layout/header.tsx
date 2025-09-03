@@ -24,15 +24,7 @@ export default function Header() {
   }
 
   return (
-    <>
-      {/* Hotline Banner */}
-      <div className="bg-primary text-primary-foreground py-2 text-center text-sm font-medium">
-        <div className="container mx-auto px-4">
-          📞 Hotline: +251-911-6033 | Available 24/7 for Property Inquiries
-        </div>
-      </div>
-
-      <header className="bg-card shadow-sm sticky top-0 z-50 border-b border-border">
+    <header className="bg-card shadow-sm sticky top-0 z-50 border-b border-border">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
@@ -126,6 +118,5 @@ export default function Header() {
           </div>
         </div>
       </header>
-    </>
   )
 }
