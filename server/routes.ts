@@ -269,6 +269,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Initialize admin user if it doesn't exist
+  app.post('/api/init-admin', async (req, res) => {
+    try {
+      const existingAdmin = await storage.getUserByEmail('admin@temer.com');
+      if (existingAdmin) {
+        return res.json({ message: 'Admin user already exists' });
+      }
+
+      const adminUser = await storage.createUser({
+        name: 'Admin User',
+        email: 'admin@temer.com',
+        passwordHash: 'admin123', // This will be hashed by the storage layer
+        role: 'admin'
+      });
+
+      res.json({ message: 'Admin user created', user: { ...adminUser, passwordHash: undefined } });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to create admin user' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -11,6 +11,7 @@ import Team from "@/pages/team";
 import Blog from "@/pages/blog";
 import BlogPost from "@/pages/blog-post";
 import Contact from "@/pages/contact";
+import Login from "@/pages/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
 import AdminTeam from "@/pages/admin/team";
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/blog" component={Blog} />
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/contact" component={Contact} />
+      <Route path="/login" component={Login} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/properties" component={AdminProperties} />
       <Route path="/admin/team" component={AdminTeam} />
