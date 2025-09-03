@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!token) {
         return res.status(401).json({ message: 'Authentication required' });
       }
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
       const user = await storage.getUser(decoded.userId);
       if (!user) {
         return res.status(401).json({ message: 'User not found' });
@@ -45,7 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '24h' });
       res.json({ token, user: { ...user, passwordHash: undefined } });
     } catch (error) {
       res.status(500).json({ message: 'Login failed' });
@@ -62,7 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const user = await storage.createUser(userData);
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '24h' });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '24h' });
       res.json({ token, user: { ...user, passwordHash: undefined } });
     } catch (error) {
       res.status(400).json({ message: 'Registration failed' });
