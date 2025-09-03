@@ -46,12 +46,12 @@ export default function PropertyCard({ property }: PropertyCardProps) {
   const callUrl = `tel:${phoneNumber}`
 
   return (
-    <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border hover:shadow-xl transition-shadow" data-testid={`property-card-${property._id}`}>
+    <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border hover:shadow-lg transition-shadow" data-testid={`property-card-${property._id}`}>
       <div className="relative">
         <img 
           src={getImageUrl(property.images[0])} 
           alt={property.title}
-          className="w-full h-64 object-cover"
+          className="w-full h-48 object-cover"
           data-testid={`property-image-${property._id}`}
         />
         <div className="absolute top-4 left-4">
@@ -81,18 +81,18 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="p-4">
         <Link href={`/property/${property.slug}`}>
-          <h3 className="text-xl font-semibold text-foreground mb-2 hover:text-primary transition-colors cursor-pointer" data-testid={`property-title-${property._id}`}>
+          <h3 className="text-lg font-semibold text-foreground mb-2 hover:text-primary transition-colors cursor-pointer" data-testid={`property-title-${property._id}`}>
             {property.title}
           </h3>
         </Link>
         
-        <p className="text-muted-foreground mb-4" data-testid={`property-location-${property._id}`}>
+        <p className="text-muted-foreground mb-3" data-testid={`property-location-${property._id}`}>
           📍 {property.location}
         </p>
         
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-4 text-sm text-muted-foreground">
             {property.bedrooms && (
               <span data-testid={`property-bedrooms-${property._id}`}>
@@ -114,7 +114,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
         </div>
         
         <div className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-primary" data-testid={`property-price-${property._id}`}>
+          <span className="text-xl font-bold text-primary" data-testid={`property-price-${property._id}`}>
             {formatCurrency(property.priceETB)}
           </span>
           <div className="flex space-x-2">
