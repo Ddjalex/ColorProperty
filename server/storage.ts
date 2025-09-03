@@ -212,14 +212,19 @@ export class MongoStorage implements IStorage {
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    const collection = await getCollection('properties');
-    const newProperty = {
-      ...property,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    const result = await collection.insertOne(newProperty);
-    return { ...newProperty, _id: result.insertedId.toString() };
+    try {
+      const collection = await getCollection('properties');
+      const newProperty = {
+        ...property,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      const result = await collection.insertOne(newProperty);
+      return { ...newProperty, _id: result.insertedId.toString() };
+    } catch (error) {
+      console.error('Error creating property:', error);
+      throw error;
+    }
   }
 
   async updateProperty(id: string, property: Partial<Property>): Promise<Property | undefined> {

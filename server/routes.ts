@@ -119,7 +119,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const property = await storage.createProperty(propertyData);
       res.json(property);
     } catch (error) {
-      res.status(400).json({ message: 'Failed to create property' });
+      console.error('Failed to create property:', error);
+      res.status(400).json({ 
+        message: 'Failed to create property',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 
