@@ -47,14 +47,13 @@ export default function Header() {
                   key={item.href}
                   href={item.href}
                   data-testid={`link-${item.name.toLowerCase()}`}
-                >
-                  <a className={`font-medium transition-colors ${
+                  className={`font-medium transition-colors ${
                     isActiveLink(item.href)
                       ? 'text-primary'
                       : 'text-foreground hover:text-primary'
-                  }`}>
-                    {item.name}
-                  </a>
+                  }`}
+                >
+                  {item.name}
                 </Link>
               ))}
             </nav>
@@ -86,21 +85,23 @@ export default function Header() {
                       href={item.href}
                       onClick={() => setIsOpen(false)}
                       data-testid={`mobile-link-${item.name.toLowerCase()}`}
-                    >
-                      <a className={`block py-2 text-lg font-medium transition-colors ${
+                      className={`block py-2 text-lg font-medium transition-colors ${
                         isActiveLink(item.href)
                           ? 'text-primary'
                           : 'text-foreground hover:text-primary'
-                      }`}>
-                        {item.name}
-                      </a>
+                      }`}
+                    >
+                      {item.name}
                     </Link>
                   ))}
                   {isAuthenticated && (
-                    <Link href="/admin" onClick={() => setIsOpen(false)} data-testid="mobile-link-admin">
-                      <a className="block py-2 text-lg font-medium text-foreground hover:text-primary">
-                        Admin
-                      </a>
+                    <Link 
+                      href="/admin" 
+                      onClick={() => setIsOpen(false)} 
+                      data-testid="mobile-link-admin"
+                      className="block py-2 text-lg font-medium text-foreground hover:text-primary"
+                    >
+                      Admin
                     </Link>
                   )}
                 </div>

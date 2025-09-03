@@ -46,11 +46,11 @@ export default function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-6">Quick Links</h3>
             <ul className="space-y-3">
-              <li><Link href="/"><a className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-home">Home</a></Link></li>
-              <li><Link href="/properties"><a className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-properties">Properties</a></Link></li>
-              <li><Link href="/team"><a className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-team">Our Team</a></Link></li>
-              <li><Link href="/blog"><a className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-blog">Blog</a></Link></li>
-              <li><Link href="/contact"><a className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-contact">Contact</a></Link></li>
+              <li><Link href="/" className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-home">Home</Link></li>
+              <li><Link href="/properties" className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-properties">Properties</Link></li>
+              <li><Link href="/team" className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-team">Our Team</Link></li>
+              <li><Link href="/blog" className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-blog">Blog</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-primary transition-colors" data-testid="footer-link-contact">Contact</Link></li>
             </ul>
           </div>
 

@@ -31,6 +31,7 @@ const propertyFormSchema = z.object({
   featured: z.boolean().default(false),
   amenities: z.array(z.string()).default([]),
   images: z.array(z.string()).default([]),
+  imageFiles: z.array(z.instanceof(File)).default([]),
   project: z.string().optional(),
   coordinates: z.object({
     lat: z.number(),
@@ -54,6 +55,7 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
   const { toast } = useToast()
   const [newAmenity, setNewAmenity] = useState('')
   const [newImage, setNewImage] = useState('')
+  const [uploadError, setUploadError] = useState('')
   
   const createProperty = useCreateProperty()
   const updateProperty = useUpdateProperty()
@@ -74,6 +76,7 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
       featured: false,
       amenities: [],
       images: [],
+      imageFiles: [],
       project: '',
       coordinates: undefined,
     },
@@ -157,7 +160,43 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
 
   const removeImage = (index: number) => {
     const currentImages = form.getValues('images')
+    const currentFiles = form.getValues('imageFiles')
     form.setValue('images', currentImages.filter((_, i) => i !== index))
+    form.setValue('imageFiles', currentFiles.filter((_, i) => i !== index))
+  }
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files
+    if (!files) return
+
+    setUploadError('')
+    const currentImages = form.getValues('images')
+    const currentFiles = form.getValues('imageFiles')
+
+    Array.from(files).forEach(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadError('Image size must be less than 5MB')
+        return
+      }
+
+      if (!file.type.startsWith('image/')) {
+        setUploadError('Please select valid image files')
+        return
+      }
+
+      // Create preview using FileReader
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const result = e.target?.result as string
+        form.setValue('images', [...currentImages, result])
+      }
+      reader.readAsDataURL(file)
+      
+      form.setValue('imageFiles', [...currentFiles, file])
+    })
+
+    // Reset the input
+    event.target.value = ''
   }
 
   return (
@@ -483,6 +522,12 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
             <CardTitle>Images</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {uploadError && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive px-3 py-2 rounded-md text-sm">
+                {uploadError}
+              </div>
+            )}
+
             <div className="space-y-2">
               {form.watch('images').map((image, index) => (
                 <div key={index} className="flex items-center gap-2 p-2 border rounded">
@@ -494,7 +539,9 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
                       e.currentTarget.src = '/placeholder-property.jpg'
                     }}
                   />
-                  <span className="flex-1 text-sm text-muted-foreground truncate">{image}</span>
+                  <span className="flex-1 text-sm text-muted-foreground truncate">
+                    {image.startsWith('data:') ? `Image file ${index + 1}` : image}
+                  </span>
                   <Button 
                     type="button"
                     variant="outline"
@@ -508,27 +555,68 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
               ))}
             </div>
 
-            <div className="flex gap-2">
-              <Input
-                placeholder="Enter image URL"
-                value={newImage}
-                onChange={(e) => setNewImage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
-                data-testid="input-new-image"
-              />
-              <Button 
-                type="button" 
-                onClick={addImage}
-                disabled={!newImage.trim()}
-                data-testid="button-add-image"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Add
-              </Button>
+            {/* File Upload */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Upload Images</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="image-upload"
+                  data-testid="input-image-files"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 cursor-pointer"
+                  data-testid="button-upload-images"
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Images
+                </label>
+                <span className="text-sm text-muted-foreground">
+                  Select multiple image files (max 5MB each)
+                </span>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+
+            {/* URL Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Add Image URL</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter image URL"
+                  value={newImage}
+                  onChange={(e) => setNewImage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
+                  data-testid="input-new-image"
+                />
+                <Button 
+                  type="button" 
+                  onClick={addImage}
+                  disabled={!newImage.trim()}
+                  data-testid="button-add-image"
+                  variant="outline"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add URL
+                </Button>
+              </div>
             </div>
 
             <p className="text-sm text-muted-foreground">
-              Enter the full URL of property images. You can use Cloudinary or other image hosting services.
+              Upload image files directly or enter URLs from Cloudinary or other image hosting services.
             </p>
           </CardContent>
         </Card>
@@ -545,14 +633,17 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
                 name="coordinates.lat"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Latitude</FormLabel>
+                    <FormLabel>Latitude (Optional)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
                         step="any"
                         placeholder="9.0320"
                         {...field} 
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === '' ? undefined : parseFloat(value) || undefined);
+                        }}
                         data-testid="input-property-latitude"
                       />
                     </FormControl>
@@ -566,14 +657,17 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
                 name="coordinates.lng"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Longitude</FormLabel>
+                    <FormLabel>Longitude (Optional)</FormLabel>
                     <FormControl>
                       <Input 
                         type="number" 
                         step="any"
                         placeholder="38.7620"
                         {...field} 
-                        onChange={(e) => field.onChange(parseFloat(e.target.value) || undefined)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === '' ? undefined : parseFloat(value) || undefined);
+                        }}
                         data-testid="input-property-longitude"
                       />
                     </FormControl>
