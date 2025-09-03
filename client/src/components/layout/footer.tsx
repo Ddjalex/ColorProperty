@@ -106,6 +106,20 @@ export default function Footer() {
               <a href="#" className="text-gray-400 hover:text-primary text-sm transition-colors" data-testid="footer-cookies">Cookie Policy</a>
             </div>
           </div>
+          <div className="text-center mt-6 pt-4 border-t border-gray-800">
+            <p className="text-gray-500 text-xs">
+              Website developed by{' '}
+              <a 
+                href="https://t.me/Ethioads012" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary/80 transition-colors font-medium"
+                data-testid="footer-developer"
+              >
+                @Ethioads012
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </footer>
