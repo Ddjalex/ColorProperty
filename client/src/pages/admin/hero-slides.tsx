@@ -11,7 +11,7 @@ import { Plus, Edit, Trash2, Search, Eye, ArrowUp, ArrowDown } from 'lucide-reac
 import { Link } from 'wouter'
 import { formatDate } from '@/lib/utils'
 import { apiRequest } from '@/lib/queryClient'
-// import HeroSlideForm from '@/components/admin/hero-slide-form'
+import HeroSlideForm from '@/components/admin/hero-slide-form'
 import type { HeroSlide } from '@shared/schema'
 
 export default function AdminHeroSlides() {
@@ -119,10 +119,10 @@ export default function AdminHeroSlides() {
                   {editingSlide ? 'Edit Hero Slide' : 'Add New Hero Slide'}
                 </DialogTitle>
               </DialogHeader>
-              <div className="text-center p-4">
-                <p className="text-muted-foreground">Hero slide form will be loaded here</p>
-                <Button onClick={handleFormClose} className="mt-4">Close</Button>
-              </div>
+              <HeroSlideForm 
+                slide={editingSlide}
+                onSuccess={handleFormClose}
+              />
             </DialogContent>
           </Dialog>
         </div>

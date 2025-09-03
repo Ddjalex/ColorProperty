@@ -114,14 +114,17 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
 
   const onSubmit = async (data: PropertyFormData) => {
     try {
+      // Exclude imageFiles from submission as they contain File objects which can't be serialized
+      const { imageFiles, ...submitData } = data
+      
       if (property) {
-        await updateProperty.mutateAsync({ id: property._id!, ...data })
+        await updateProperty.mutateAsync({ id: property._id!, ...submitData })
         toast({
           title: "Property Updated",
           description: "The property has been successfully updated.",
         })
       } else {
-        await createProperty.mutateAsync(data)
+        await createProperty.mutateAsync(submitData)
         toast({
           title: "Property Created",
           description: "The property has been successfully created.",
