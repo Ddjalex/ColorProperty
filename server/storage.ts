@@ -1,0 +1,566 @@
+import { getCollection } from './db.js';
+import { ObjectId } from 'mongodb';
+import bcrypt from 'bcrypt';
+
+import type { 
+  User, 
+  InsertUser, 
+  Property, 
+  InsertProperty,
+  Project,
+  InsertProject,
+  ConstructionUpdate,
+  InsertConstructionUpdate,
+  BlogPost,
+  InsertBlogPost,
+  TeamMember,
+  InsertTeamMember,
+  Lead,
+  InsertLead,
+  Settings,
+  InsertSettings
+} from "@shared/schema";
+
+export interface IStorage {
+  // User methods
+  getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, user: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
+
+  // Property methods
+  getProperties(filters?: any): Promise<Property[]>;
+  getProperty(id: string): Promise<Property | undefined>;
+  getPropertyBySlug(slug: string): Promise<Property | undefined>;
+  createProperty(property: InsertProperty): Promise<Property>;
+  updateProperty(id: string, property: Partial<Property>): Promise<Property | undefined>;
+  deleteProperty(id: string): Promise<boolean>;
+  getFeaturedProperties(): Promise<Property[]>;
+
+  // Project methods
+  getProjects(): Promise<Project[]>;
+  getProject(id: string): Promise<Project | undefined>;
+  createProject(project: InsertProject): Promise<Project>;
+  updateProject(id: string, project: Partial<Project>): Promise<Project | undefined>;
+  deleteProject(id: string): Promise<boolean>;
+
+  // Construction Update methods
+  getConstructionUpdates(projectId?: string): Promise<ConstructionUpdate[]>;
+  createConstructionUpdate(update: InsertConstructionUpdate): Promise<ConstructionUpdate>;
+  updateConstructionUpdate(id: string, update: Partial<ConstructionUpdate>): Promise<ConstructionUpdate | undefined>;
+  deleteConstructionUpdate(id: string): Promise<boolean>;
+
+  // Blog methods
+  getBlogPosts(status?: string): Promise<BlogPost[]>;
+  getBlogPost(id: string): Promise<BlogPost | undefined>;
+  getBlogPostBySlug(slug: string): Promise<BlogPost | undefined>;
+  createBlogPost(post: InsertBlogPost): Promise<BlogPost>;
+  updateBlogPost(id: string, post: Partial<BlogPost>): Promise<BlogPost | undefined>;
+  deleteBlogPost(id: string): Promise<boolean>;
+
+  // Team methods
+  getTeamMembers(): Promise<TeamMember[]>;
+  getTeamMember(id: string): Promise<TeamMember | undefined>;
+  createTeamMember(member: InsertTeamMember): Promise<TeamMember>;
+  updateTeamMember(id: string, member: Partial<TeamMember>): Promise<TeamMember | undefined>;
+  deleteTeamMember(id: string): Promise<boolean>;
+
+  // Lead methods
+  getLeads(): Promise<Lead[]>;
+  createLead(lead: InsertLead): Promise<Lead>;
+  updateLead(id: string, lead: Partial<Lead>): Promise<Lead | undefined>;
+  deleteLead(id: string): Promise<boolean>;
+
+  // Settings methods
+  getSettings(): Promise<Settings | undefined>;
+  updateSettings(settings: Partial<Settings>): Promise<Settings>;
+}
+
+export class MongoStorage implements IStorage {
+  // User methods
+  async getUser(id: string): Promise<User | undefined> {
+    try {
+      const collection = await getCollection('users');
+      const user = await collection.findOne({ _id: new ObjectId(id) });
+      return user || undefined;
+    } catch (error) {
+      console.error('Error getting user:', error);
+      return undefined;
+    }
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    try {
+      const collection = await getCollection('users');
+      const user = await collection.findOne({ email });
+      return user || undefined;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      return undefined;
+    }
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const collection = await getCollection('users');
+    const hashedPassword = await bcrypt.hash(user.passwordHash, 10);
+    const newUser = {
+      ...user,
+      passwordHash: hashedPassword,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newUser);
+    return { ...newUser, _id: result.insertedId.toString() };
+  }
+
+  async updateUser(id: string, user: Partial<User>): Promise<User | undefined> {
+    try {
+      const collection = await getCollection('users');
+      const updateData = { ...user, updatedAt: new Date() };
+      if (updateData.passwordHash) {
+        updateData.passwordHash = await bcrypt.hash(updateData.passwordHash, 10);
+      }
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      return undefined;
+    }
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('users');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return false;
+    }
+  }
+
+  // Property methods
+  async getProperties(filters: any = {}): Promise<Property[]> {
+    try {
+      const collection = await getCollection('properties');
+      const query: any = {};
+      
+      if (filters.location) {
+        query.location = new RegExp(filters.location, 'i');
+      }
+      if (filters.propertyType) {
+        query.propertyType = filters.propertyType;
+      }
+      if (filters.bedrooms) {
+        query.bedrooms = { $gte: parseInt(filters.bedrooms) };
+      }
+      if (filters.status) {
+        query.status = filters.status;
+      }
+      if (filters.minPrice) {
+        query.priceETB = { $gte: parseInt(filters.minPrice) };
+      }
+      if (filters.maxPrice) {
+        if (query.priceETB) {
+          query.priceETB.$lte = parseInt(filters.maxPrice);
+        } else {
+          query.priceETB = { $lte: parseInt(filters.maxPrice) };
+        }
+      }
+
+      const properties = await collection.find(query).sort({ createdAt: -1 }).toArray();
+      return properties;
+    } catch (error) {
+      console.error('Error getting properties:', error);
+      return [];
+    }
+  }
+
+  async getProperty(id: string): Promise<Property | undefined> {
+    try {
+      const collection = await getCollection('properties');
+      const property = await collection.findOne({ _id: new ObjectId(id) });
+      return property || undefined;
+    } catch (error) {
+      console.error('Error getting property:', error);
+      return undefined;
+    }
+  }
+
+  async getPropertyBySlug(slug: string): Promise<Property | undefined> {
+    try {
+      const collection = await getCollection('properties');
+      const property = await collection.findOne({ slug });
+      return property || undefined;
+    } catch (error) {
+      console.error('Error getting property by slug:', error);
+      return undefined;
+    }
+  }
+
+  async createProperty(property: InsertProperty): Promise<Property> {
+    const collection = await getCollection('properties');
+    const newProperty = {
+      ...property,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await collection.insertOne(newProperty);
+    return { ...newProperty, _id: result.insertedId.toString() };
+  }
+
+  async updateProperty(id: string, property: Partial<Property>): Promise<Property | undefined> {
+    try {
+      const collection = await getCollection('properties');
+      const updateData = { ...property, updatedAt: new Date() };
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating property:', error);
+      return undefined;
+    }
+  }
+
+  async deleteProperty(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('properties');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      return false;
+    }
+  }
+
+  async getFeaturedProperties(): Promise<Property[]> {
+    try {
+      const collection = await getCollection('properties');
+      const properties = await collection.find({ featured: true, status: 'active' }).limit(6).toArray();
+      return properties;
+    } catch (error) {
+      console.error('Error getting featured properties:', error);
+      return [];
+    }
+  }
+
+  // Project methods
+  async getProjects(): Promise<Project[]> {
+    try {
+      const collection = await getCollection('projects');
+      const projects = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      return projects;
+    } catch (error) {
+      console.error('Error getting projects:', error);
+      return [];
+    }
+  }
+
+  async getProject(id: string): Promise<Project | undefined> {
+    try {
+      const collection = await getCollection('projects');
+      const project = await collection.findOne({ _id: new ObjectId(id) });
+      return project || undefined;
+    } catch (error) {
+      console.error('Error getting project:', error);
+      return undefined;
+    }
+  }
+
+  async createProject(project: InsertProject): Promise<Project> {
+    const collection = await getCollection('projects');
+    const newProject = {
+      ...project,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newProject);
+    return { ...newProject, _id: result.insertedId.toString() };
+  }
+
+  async updateProject(id: string, project: Partial<Project>): Promise<Project | undefined> {
+    try {
+      const collection = await getCollection('projects');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: project },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating project:', error);
+      return undefined;
+    }
+  }
+
+  async deleteProject(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('projects');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      return false;
+    }
+  }
+
+  // Construction Update methods
+  async getConstructionUpdates(projectId?: string): Promise<ConstructionUpdate[]> {
+    try {
+      const collection = await getCollection('construction_updates');
+      const query = projectId ? { projectId } : {};
+      const updates = await collection.find(query).sort({ publishedAt: -1 }).toArray();
+      return updates;
+    } catch (error) {
+      console.error('Error getting construction updates:', error);
+      return [];
+    }
+  }
+
+  async createConstructionUpdate(update: InsertConstructionUpdate): Promise<ConstructionUpdate> {
+    const collection = await getCollection('construction_updates');
+    const newUpdate = {
+      ...update,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newUpdate);
+    return { ...newUpdate, _id: result.insertedId.toString() };
+  }
+
+  async updateConstructionUpdate(id: string, update: Partial<ConstructionUpdate>): Promise<ConstructionUpdate | undefined> {
+    try {
+      const collection = await getCollection('construction_updates');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: update },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating construction update:', error);
+      return undefined;
+    }
+  }
+
+  async deleteConstructionUpdate(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('construction_updates');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting construction update:', error);
+      return false;
+    }
+  }
+
+  // Blog methods
+  async getBlogPosts(status?: string): Promise<BlogPost[]> {
+    try {
+      const collection = await getCollection('blog_posts');
+      const query = status ? { status } : {};
+      const posts = await collection.find(query).sort({ publishedAt: -1 }).toArray();
+      return posts;
+    } catch (error) {
+      console.error('Error getting blog posts:', error);
+      return [];
+    }
+  }
+
+  async getBlogPost(id: string): Promise<BlogPost | undefined> {
+    try {
+      const collection = await getCollection('blog_posts');
+      const post = await collection.findOne({ _id: new ObjectId(id) });
+      return post || undefined;
+    } catch (error) {
+      console.error('Error getting blog post:', error);
+      return undefined;
+    }
+  }
+
+  async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
+    try {
+      const collection = await getCollection('blog_posts');
+      const post = await collection.findOne({ slug });
+      return post || undefined;
+    } catch (error) {
+      console.error('Error getting blog post by slug:', error);
+      return undefined;
+    }
+  }
+
+  async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
+    const collection = await getCollection('blog_posts');
+    const newPost = {
+      ...post,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await collection.insertOne(newPost);
+    return { ...newPost, _id: result.insertedId.toString() };
+  }
+
+  async updateBlogPost(id: string, post: Partial<BlogPost>): Promise<BlogPost | undefined> {
+    try {
+      const collection = await getCollection('blog_posts');
+      const updateData = { ...post, updatedAt: new Date() };
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating blog post:', error);
+      return undefined;
+    }
+  }
+
+  async deleteBlogPost(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('blog_posts');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting blog post:', error);
+      return false;
+    }
+  }
+
+  // Team methods
+  async getTeamMembers(): Promise<TeamMember[]> {
+    try {
+      const collection = await getCollection('team_members');
+      const members = await collection.find({}).sort({ order: 1 }).toArray();
+      return members;
+    } catch (error) {
+      console.error('Error getting team members:', error);
+      return [];
+    }
+  }
+
+  async getTeamMember(id: string): Promise<TeamMember | undefined> {
+    try {
+      const collection = await getCollection('team_members');
+      const member = await collection.findOne({ _id: new ObjectId(id) });
+      return member || undefined;
+    } catch (error) {
+      console.error('Error getting team member:', error);
+      return undefined;
+    }
+  }
+
+  async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
+    const collection = await getCollection('team_members');
+    const newMember = {
+      ...member,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newMember);
+    return { ...newMember, _id: result.insertedId.toString() };
+  }
+
+  async updateTeamMember(id: string, member: Partial<TeamMember>): Promise<TeamMember | undefined> {
+    try {
+      const collection = await getCollection('team_members');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: member },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating team member:', error);
+      return undefined;
+    }
+  }
+
+  async deleteTeamMember(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('team_members');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting team member:', error);
+      return false;
+    }
+  }
+
+  // Lead methods
+  async getLeads(): Promise<Lead[]> {
+    try {
+      const collection = await getCollection('leads');
+      const leads = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      return leads;
+    } catch (error) {
+      console.error('Error getting leads:', error);
+      return [];
+    }
+  }
+
+  async createLead(lead: InsertLead): Promise<Lead> {
+    const collection = await getCollection('leads');
+    const newLead = {
+      ...lead,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newLead);
+    return { ...newLead, _id: result.insertedId.toString() };
+  }
+
+  async updateLead(id: string, lead: Partial<Lead>): Promise<Lead | undefined> {
+    try {
+      const collection = await getCollection('leads');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: lead },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating lead:', error);
+      return undefined;
+    }
+  }
+
+  async deleteLead(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('leads');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting lead:', error);
+      return false;
+    }
+  }
+
+  // Settings methods
+  async getSettings(): Promise<Settings | undefined> {
+    try {
+      const collection = await getCollection('settings');
+      const settings = await collection.findOne({});
+      return settings || undefined;
+    } catch (error) {
+      console.error('Error getting settings:', error);
+      return undefined;
+    }
+  }
+
+  async updateSettings(settings: Partial<Settings>): Promise<Settings> {
+    const collection = await getCollection('settings');
+    const updateData = { ...settings, updatedAt: new Date() };
+    const result = await collection.findOneAndUpdate(
+      {},
+      { $set: updateData },
+      { upsert: true, returnDocument: 'after' }
+    );
+    return result.value;
+  }
+}
+
+export const storage = new MongoStorage();
