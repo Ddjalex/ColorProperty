@@ -64,16 +64,7 @@ export default function Header() {
               <Button variant="ghost" size="icon" data-testid="button-favorites">
                 <Heart className="h-5 w-5" />
               </Button>
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-2">
-                  <Link href="/admin" data-testid="link-admin">
-                    <Button variant="outline">Admin</Button>
-                  </Link>
-                  <Button onClick={logout} data-testid="button-logout">
-                    Logout
-                  </Button>
-                </div>
-              ) : (
+              {!isAuthenticated && (
                 <Link href="/login" data-testid="link-login">
                   <Button>Login</Button>
                 </Link>
