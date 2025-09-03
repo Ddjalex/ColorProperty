@@ -1,15 +1,19 @@
 import { Link } from 'wouter'
-import { Heart, Phone, MessageCircle, Bed, Bath, Square } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { Heart, Phone, MessageCircle, Bed, Bath, Square, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { formatCurrency, generateWhatsAppUrl, getImageUrl } from '@/lib/utils'
-import type { Property } from '@shared/schema'
+import { formatCurrency, getImageUrl } from '@/lib/utils'
+import type { Property, Settings } from '@shared/schema'
 
 interface PropertyCardProps {
   property: Property
 }
 
 export default function PropertyCard({ property }: PropertyCardProps) {
+  const { data: settings } = useQuery<Settings>({
+    queryKey: ['/api/settings'],
+  })
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-primary'
@@ -28,8 +32,18 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     }
   }
 
-  const whatsappMessage = `I'm interested in ${property.title} - ${formatCurrency(property.priceETB)}`
-  const whatsappUrl = generateWhatsAppUrl('+251911006033', whatsappMessage)
+  const phoneNumber = settings?.phoneNumber || '0974408281'
+  const whatsappNumber = settings?.whatsappNumber || '0974408281'
+  const propertyUrl = `${window.location.origin}/property/${property.slug}`
+  
+  const whatsappMessage = settings?.whatsappTemplate
+    ?.replace('{propertyTitle}', property.title)
+    ?.replace('{propertyPrice}', formatCurrency(property.priceETB))
+    ?.replace('{propertyLink}', propertyUrl) || 
+    `I'm interested in ${property.title} - ${formatCurrency(property.priceETB)}. Property link: ${propertyUrl}`
+  
+  const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`
+  const callUrl = `tel:${phoneNumber}`
 
   return (
     <div className="bg-card rounded-xl shadow-lg overflow-hidden border border-border hover:shadow-xl transition-shadow" data-testid={`property-card-${property._id}`}>
@@ -104,8 +118,19 @@ export default function PropertyCard({ property }: PropertyCardProps) {
             {formatCurrency(property.priceETB)}
           </span>
           <div className="flex space-x-2">
+            <Link href={`/property/${property.slug}`}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="flex items-center space-x-1"
+                data-testid={`button-view-details-${property._id}`}
+              >
+                <Eye className="h-4 w-4" />
+                <span>View</span>
+              </Button>
+            </Link>
             <a 
-              href="tel:+251911006033" 
+              href={callUrl} 
               className="bg-secondary hover:bg-secondary/90 text-secondary-foreground p-2 rounded-lg transition-colors"
               data-testid={`button-call-${property._id}`}
             >

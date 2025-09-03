@@ -23,6 +23,8 @@ export default function AdminSettings() {
   })
 
   const [formData, setFormData] = useState({
+    phoneNumber: '',
+    whatsappNumber: '',
     hotlineNumbers: [] as string[],
     socialLinks: {
       facebook: '',
@@ -44,6 +46,8 @@ export default function AdminSettings() {
   React.useEffect(() => {
     if (settings) {
       setFormData({
+        phoneNumber: settings.phoneNumber || '0974408281',
+        whatsappNumber: settings.whatsappNumber || '0974408281',
         hotlineNumbers: settings.hotlineNumbers || [],
         socialLinks: {
           facebook: settings.socialLinks?.facebook || '',
@@ -53,7 +57,7 @@ export default function AdminSettings() {
           linkedin: settings.socialLinks?.linkedin || '',
           telegram: settings.socialLinks?.telegram || '',
         },
-        whatsappTemplate: settings.whatsappTemplate || "I'm interested in {propertyTitle}",
+        whatsappTemplate: settings.whatsappTemplate || "I'm interested in {propertyTitle} - {propertyPrice}. Property link: {propertyLink}",
         seoDefaults: {
           title: settings.seoDefaults?.title || '',
           description: settings.seoDefaults?.description || '',
@@ -163,6 +167,65 @@ export default function AdminSettings() {
         </div>
 
         <form onSubmit={handleSubmit} className="max-w-4xl space-y-8">
+          {/* Contact Settings */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Contact Settings</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Primary contact numbers used for call and WhatsApp buttons on property listings
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    Phone Number
+                  </label>
+                  <Input
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    placeholder="0974408281"
+                    data-testid="input-phone-number"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Used for call buttons on property cards
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-2">
+                    WhatsApp Number
+                  </label>
+                  <Input
+                    type="tel"
+                    value={formData.whatsappNumber}
+                    onChange={(e) => setFormData(prev => ({ ...prev, whatsappNumber: e.target.value }))}
+                    placeholder="0974408281"
+                    data-testid="input-whatsapp-number"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Used for WhatsApp buttons on property cards
+                  </p>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-2">
+                  WhatsApp Message Template
+                </label>
+                <Textarea
+                  value={formData.whatsappTemplate}
+                  onChange={(e) => setFormData(prev => ({ ...prev, whatsappTemplate: e.target.value }))}
+                  placeholder="I'm interested in {propertyTitle} - {propertyPrice}. Property link: {propertyLink}"
+                  rows={3}
+                  data-testid="input-whatsapp-template"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Available variables: {'{propertyTitle}'}, {'{propertyPrice}'}, {'{propertyLink}'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Hotline Numbers */}
           <Card>
             <CardHeader>

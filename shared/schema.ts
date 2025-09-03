@@ -152,6 +152,8 @@ export type InsertHeroSlide = z.infer<typeof insertHeroSlideSchema>;
 // Settings schema
 export const settingsSchema = z.object({
   _id: z.string().optional(),
+  phoneNumber: z.string().default('0974408281'),
+  whatsappNumber: z.string().default('0974408281'),
   hotlineNumbers: z.array(z.string()).default([]),
   socialLinks: z.object({
     facebook: z.string().optional(),
@@ -161,7 +163,7 @@ export const settingsSchema = z.object({
     linkedin: z.string().optional(),
     telegram: z.string().optional(),
   }).default({}),
-  whatsappTemplate: z.string().default("I'm interested in {propertyTitle}"),
+  whatsappTemplate: z.string().default("I'm interested in {propertyTitle} - {propertyPrice}. Property link: {propertyLink}"),
   seoDefaults: z.object({
     title: z.string().optional(),
     description: z.string().optional(),

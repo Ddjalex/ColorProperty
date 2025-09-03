@@ -1,5 +1,6 @@
 import { useParams } from 'wouter'
 import { useQuery } from '@tanstack/react-query'
+import { useWebSocket } from '@/hooks/use-websocket'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 import { Button } from '@/components/ui/button'
@@ -8,13 +9,20 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Phone, MessageCircle, Bed, Bath, Square, MapPin, Calendar, Heart, Share2 } from 'lucide-react'
 import { formatCurrency, generateWhatsAppUrl, getImageUrl, formatDate } from '@/lib/utils'
-import type { Property } from '@shared/schema'
+import type { Property, Settings } from '@shared/schema'
 
 export default function PropertyDetail() {
   const { slug } = useParams<{ slug: string }>()
   
+  // Connect to WebSocket for real-time updates
+  useWebSocket()
+  
   const { data: property, isLoading, error } = useQuery<Property>({
     queryKey: ['/api/properties/slug', slug],
+  })
+  
+  const { data: settings } = useQuery<Settings>({
+    queryKey: ['/api/settings'],
   })
 
   if (isLoading) {
@@ -48,8 +56,18 @@ export default function PropertyDetail() {
     )
   }
 
-  const whatsappMessage = `I'm interested in ${property.title} - ${formatCurrency(property.priceETB)}`
-  const whatsappUrl = generateWhatsAppUrl('+251911006033', whatsappMessage)
+  const phoneNumber = settings?.phoneNumber || '0974408281'
+  const whatsappNumber = settings?.whatsappNumber || '0974408281'
+  const propertyUrl = `${window.location.origin}/property/${property.slug}`
+  
+  const whatsappMessage = settings?.whatsappTemplate
+    ?.replace('{propertyTitle}', property.title)
+    ?.replace('{propertyPrice}', formatCurrency(property.priceETB))
+    ?.replace('{propertyLink}', propertyUrl) || 
+    `I'm interested in ${property.title} - ${formatCurrency(property.priceETB)}. Property link: ${propertyUrl}`
+  
+  const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`
+  const callUrl = `tel:${phoneNumber}`
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -199,12 +217,12 @@ export default function PropertyDetail() {
                 
                 <div className="space-y-4">
                   <a 
-                    href="tel:+251911006033"
+                    href={callUrl}
                     className="w-full"
                   >
-                    <Button className="w-full bg-secondary hover:bg-secondary/90" data-testid="button-call-property">
+                    <Button className="w-full bg-primary hover:bg-primary/90" data-testid="button-call-property">
                       <Phone className="h-4 w-4 mr-2" />
-                      Call Now
+                      Call {phoneNumber}
                     </Button>
                   </a>
                   
@@ -216,7 +234,7 @@ export default function PropertyDetail() {
                   >
                     <Button className="w-full bg-green-500 hover:bg-green-600 text-white" data-testid="button-whatsapp-property">
                       <MessageCircle className="h-4 w-4 mr-2" />
-                      WhatsApp
+                      WhatsApp {whatsappNumber}
                     </Button>
                   </a>
                   
