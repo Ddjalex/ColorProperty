@@ -117,6 +117,16 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
       // Exclude imageFiles from submission as they contain File objects which can't be serialized
       const { imageFiles, ...submitData } = data
       
+      // Handle coordinates - only include if both lat and lng are provided
+      if (submitData.coordinates) {
+        const { lat, lng } = submitData.coordinates
+        if (lat !== undefined && lng !== undefined && lat !== null && lng !== null) {
+          submitData.coordinates = { lat, lng }
+        } else {
+          delete submitData.coordinates
+        }
+      }
+      
       if (property) {
         await updateProperty.mutateAsync({ id: property._id!, ...submitData })
         toast({

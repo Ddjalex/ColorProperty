@@ -1,0 +1,47 @@
+client:495 [vite] connecting...
+client:618 [vite] connected.
+chunk-WERSD76P.js?v=77a301cf:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+chunk-WERSD76P.js?v=77a301cf:377 [Violation] 'message' handler took 256ms
+@radix-ui_react-dialog.js?v=77a301cf:337 Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+(anonymous) @ @radix-ui_react-dialog.js?v=77a301cf:337
+commitHookEffectListMount @ chunk-WERSD76P.js?v=77a301cf:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=77a301cf:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=77a301cf:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=77a301cf:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=77a301cf:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=77a301cf:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=77a301cf:19447
+commitRootImpl @ chunk-WERSD76P.js?v=77a301cf:19416
+commitRoot @ chunk-WERSD76P.js?v=77a301cf:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=77a301cf:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=77a301cf:9119
+(anonymous) @ chunk-WERSD76P.js?v=77a301cf:18627
+chunk-WERSD76P.js?v=77a301cf:18625 [Violation] 'click' handler took 226ms
+[Violation] Forced reflow while executing JavaScript took 61ms
+queryClient.ts:26  POST https://0daff42f-8627-499b-a319-3e5dfc3e826c-00-6m6pgvfjzohq.spock.replit.dev/api/properties 400 (Bad Request)
+apiRequest @ queryClient.ts:26
+mutationFn @ use-properties.ts:34
+fn @ @tanstack_react-query.js?v=77a301cf:1189
+run @ @tanstack_react-query.js?v=77a301cf:494
+start @ @tanstack_react-query.js?v=77a301cf:536
+execute @ @tanstack_react-query.js?v=77a301cf:1225
+await in execute
+mutate @ @tanstack_react-query.js?v=77a301cf:2630
+onSubmit @ property-form.tsx:127
+(anonymous) @ chunk-CXJMC5RA.js?v=77a301cf:1465
+await in (anonymous)
+callCallback2 @ chunk-WERSD76P.js?v=77a301cf:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=77a301cf:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=77a301cf:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=77a301cf:3736
+executeDispatch @ chunk-WERSD76P.js?v=77a301cf:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=77a301cf:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=77a301cf:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=77a301cf:7051
+(anonymous) @ chunk-WERSD76P.js?v=77a301cf:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=77a301cf:18913
+batchedUpdates @ chunk-WERSD76P.js?v=77a301cf:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=77a301cf:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=77a301cf:5478
+dispatchEvent @ chunk-WERSD76P.js?v=77a301cf:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=77a301cf:5449
