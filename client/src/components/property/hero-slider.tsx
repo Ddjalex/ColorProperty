@@ -4,54 +4,21 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { HeroSlide } from '@shared/schema'
 
-// Fallback slides if no slides are configured
-const fallbackSlides = [
-  {
-    _id: 'fallback-1',
-    title: 'Find Your Dream Home in Ethiopia',
-    subtitle: 'Discover premium properties across Addis Ababa and beyond. From luxury apartments to commercial spaces, we have it all.',
-    imageUrl: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-    ctaText: 'Browse Properties',
-    ctaLink: '/properties',
-    order: 0,
-    isActive: true,
-  },
-  {
-    _id: 'fallback-2',
-    title: 'Luxury Living Redefined',
-    subtitle: 'Experience modern amenities and prime locations in our carefully selected properties.',
-    imageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-    ctaText: 'View Properties',
-    ctaLink: '/properties',
-    order: 1,
-    isActive: true,
-  },
-  {
-    _id: 'fallback-3',
-    title: 'Investment Opportunities',
-    subtitle: 'Discover profitable real estate investments in Ethiopia\'s growing market.',
-    imageUrl: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-    ctaText: 'Learn More',
-    ctaLink: '/properties',
-    order: 2,
-    isActive: true,
-  },
-]
 
 export default function HeroSlider() {
   const [currentSlide, setCurrentSlide] = useState(0)
 
   // Fetch hero slides from API
-  const { data: apiSlides = [] } = useQuery<HeroSlide[]>({
+  const { data: apiSlides = [], isLoading } = useQuery<HeroSlide[]>({
     queryKey: ['/api/hero-slides'],
   })
 
-  // Use API slides if available and active, otherwise use fallback slides
-  const slides = apiSlides.filter(slide => slide.isActive).length > 0 
-    ? apiSlides.filter(slide => slide.isActive).sort((a, b) => (a.order || 0) - (b.order || 0))
-    : fallbackSlides
+  // Use only active slides from admin panel
+  const slides = apiSlides.filter(slide => slide.isActive).sort((a, b) => (a.order || 0) - (b.order || 0))
 
   useEffect(() => {
+    if (slides.length === 0) return
+    
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length)
     }, 5000)
@@ -69,6 +36,51 @@ export default function HeroSlider() {
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length)
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="relative h-screen overflow-hidden bg-gray-900 flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-lg">Loading hero slides...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Empty state
+  if (slides.length === 0) {
+    return (
+      <div className="relative h-screen overflow-hidden bg-gray-900 flex items-center justify-center">
+        <div className="container mx-auto px-4 text-center text-white">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            Welcome to Temer Properties
+          </h1>
+          <p className="text-xl mb-8 text-gray-200">
+            Your trusted partner in Ethiopian real estate
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg"
+              onClick={() => window.location.href = '/properties'}
+            >
+              Browse Properties
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 text-lg"
+              onClick={() => window.location.href = '/contact'}
+            >
+              Contact Us
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
