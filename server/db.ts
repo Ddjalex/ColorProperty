@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-const CONNECTION_STRING = process.env.DATABASE_URL || 'mongodb+srv://walmeseged_db_user:A1l2m3e4s5@gift.k3fycs2.mongodb.net/?retryWrites=true&w=majority&appName=Gift';
+const CONNECTION_STRING = 'mongodb+srv://walmeseged_db_user:A1l2m3e4s5@gift.k3fycs2.mongodb.net/?retryWrites=true&w=majority&appName=Gift';
 
 let db: any = null;
 let client: any = null;
