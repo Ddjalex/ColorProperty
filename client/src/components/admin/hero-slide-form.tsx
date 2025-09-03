@@ -105,22 +105,20 @@ export default function HeroSlideForm({ slide, onSuccess }: HeroSlideFormProps) 
     try {
       setUploadError('')
       
-      // For now, we'll use the image URL directly
-      // In a real app, you'd upload to a cloud service like Cloudinary
-      const slideData = {
-        title: data.title,
-        subtitle: data.subtitle,
-        imageUrl: data.imageUrl,
-        ctaText: data.ctaText || undefined,
-        ctaLink: data.ctaLink || undefined,
-        order: data.order,
-        isActive: data.isActive,
+      // Exclude imageFile from submission as it contains File object which can't be serialized
+      const { imageFile, ...slideData } = data
+      
+      // Ensure ctaText and ctaLink are undefined if empty
+      const submitData = {
+        ...slideData,
+        ctaText: slideData.ctaText || undefined,
+        ctaLink: slideData.ctaLink || undefined,
       }
 
       if (slide) {
-        updateMutation.mutate(slideData)
+        updateMutation.mutate(submitData)
       } else {
-        createMutation.mutate(slideData)
+        createMutation.mutate(submitData)
       }
     } catch (error) {
       setUploadError('An error occurred while saving the slide')
