@@ -66,7 +66,19 @@ export default function PropertyDetail() {
     ?.replace('{propertyLink}', propertyUrl) || 
     `I'm interested in ${property.title} - ${formatCurrency(property.priceETB)}. Property link: ${propertyUrl}`
   
-  const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(whatsappMessage)}`
+  // Format WhatsApp number - add Ethiopia country code if not present
+  const formatWhatsAppNumber = (number: string) => {
+    const cleanNumber = number.replace(/[^0-9]/g, '')
+    if (cleanNumber.startsWith('251')) {
+      return cleanNumber
+    }
+    if (cleanNumber.startsWith('0')) {
+      return '251' + cleanNumber.substring(1)
+    }
+    return '251' + cleanNumber
+  }
+  
+  const whatsappUrl = `https://wa.me/${formatWhatsAppNumber(whatsappNumber)}?text=${encodeURIComponent(whatsappMessage)}`
   const callUrl = `tel:${phoneNumber}`
 
   const getStatusColor = (status: string) => {
