@@ -34,8 +34,8 @@ const propertyFormSchema = z.object({
   imageFiles: z.array(z.instanceof(File)).default([]),
   project: z.string().optional(),
   coordinates: z.object({
-    lat: z.number(),
-    lng: z.number(),
+    lat: z.number().optional(),
+    lng: z.number().optional(),
   }).optional(),
 })
 
