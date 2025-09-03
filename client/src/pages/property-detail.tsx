@@ -91,10 +91,10 @@ export default function PropertyDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-4">
         {/* Image Gallery */}
-        <div className="relative mb-6">
-          <div className="h-64 md:h-80 bg-cover bg-center rounded-xl overflow-hidden">
+        <div className="relative mb-4">
+          <div className="h-48 md:h-60 bg-cover bg-center rounded-lg overflow-hidden">
             <img 
               src={getImageUrl(property.images[0])} 
               alt={property.title}
@@ -124,55 +124,55 @@ export default function PropertyDetail() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Title and Location */}
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-foreground mb-2" data-testid="property-title">
+            <div className="mb-4">
+              <h1 className="text-2xl font-bold text-foreground mb-2" data-testid="property-title">
                 {property.title}
               </h1>
               <div className="flex items-center text-muted-foreground mb-4" data-testid="property-location">
                 <MapPin className="h-4 w-4 mr-2" />
                 {property.location}
               </div>
-              <div className="text-3xl font-bold text-primary" data-testid="property-price">
+              <div className="text-2xl font-bold text-primary" data-testid="property-price">
                 {formatCurrency(property.priceETB)}
               </div>
             </div>
 
             {/* Key Details */}
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-3 mb-6">
               {property.bedrooms && (
-                <div className="text-center p-4 bg-muted rounded-lg" data-testid="property-bedrooms">
-                  <Bed className="h-6 w-6 mx-auto mb-2 text-primary" />
+                <div className="text-center p-3 bg-muted rounded-lg" data-testid="property-bedrooms">
+                  <Bed className="h-5 w-5 mx-auto mb-1 text-primary" />
                   <div className="font-semibold">{property.bedrooms}</div>
                   <div className="text-sm text-muted-foreground">Bedrooms</div>
                 </div>
               )}
               {property.bathrooms && (
-                <div className="text-center p-4 bg-muted rounded-lg" data-testid="property-bathrooms">
-                  <Bath className="h-6 w-6 mx-auto mb-2 text-primary" />
+                <div className="text-center p-3 bg-muted rounded-lg" data-testid="property-bathrooms">
+                  <Bath className="h-5 w-5 mx-auto mb-1 text-primary" />
                   <div className="font-semibold">{property.bathrooms}</div>
                   <div className="text-sm text-muted-foreground">Bathrooms</div>
                 </div>
               )}
-              <div className="text-center p-4 bg-muted rounded-lg" data-testid="property-size">
-                <Square className="h-6 w-6 mx-auto mb-2 text-primary" />
+              <div className="text-center p-3 bg-muted rounded-lg" data-testid="property-size">
+                <Square className="h-5 w-5 mx-auto mb-1 text-primary" />
                 <div className="font-semibold">{property.sizeSqm}</div>
                 <div className="text-sm text-muted-foreground">Square Meters</div>
               </div>
             </div>
 
             {/* Tabs */}
-            <Tabs defaultValue="description" className="mb-8">
+            <Tabs defaultValue="description" className="mb-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="description" data-testid="tab-description">Description</TabsTrigger>
                 <TabsTrigger value="amenities" data-testid="tab-amenities">Amenities</TabsTrigger>
                 <TabsTrigger value="location" data-testid="tab-location">Location</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="description" className="mt-6">
+              <TabsContent value="description" className="mt-4">
                 <div className="prose max-w-none" data-testid="property-description">
                   <p>{property.description}</p>
                 </div>
