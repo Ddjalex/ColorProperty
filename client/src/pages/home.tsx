@@ -7,11 +7,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Award, Handshake, Clock, MapPin } from 'lucide-react'
+import { useWebSocket } from '@/hooks/use-websocket'
 import type { Property } from '@shared/schema'
 
 export default function Home() {
+  // Connect to WebSocket for real-time updates
+  useWebSocket()
+  
   const { data: featuredProperties = [], isLoading } = useQuery<Property[]>({
     queryKey: ['/api/properties/featured'],
+  })
+  
+  const { data: allProperties = [], isLoading: isLoadingAll } = useQuery<Property[]>({
+    queryKey: ['/api/properties'],
   })
 
   return (
@@ -84,21 +92,21 @@ export default function Home() {
             </p>
           </div>
 
-          {isLoading ? (
+          {isLoadingAll ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="bg-card rounded-xl shadow-lg h-96 animate-pulse" />
               ))}
             </div>
-          ) : featuredProperties.length > 0 ? (
+          ) : allProperties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredProperties.map((property) => (
+              {allProperties.slice(0, 6).map((property) => (
                 <PropertyCard key={property._id} property={property} />
               ))}
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground text-lg">No featured properties available at the moment.</p>
+              <p className="text-muted-foreground text-lg">No properties available at the moment.</p>
             </div>
           )}
 

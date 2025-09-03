@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { 
   insertPropertySchema, 
@@ -352,5 +353,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
+  
+  // WebSocket Server for real-time updates
+  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  
+  // Store active WebSocket connections
+  const clients = new Set<WebSocket>();
+  
+  wss.on('connection', (ws) => {
+    clients.add(ws);
+    console.log('Client connected to WebSocket');
+    
+    ws.on('close', () => {
+      clients.delete(ws);
+      console.log('Client disconnected from WebSocket');
+    });
+    
+    ws.on('error', (error) => {
+      console.error('WebSocket error:', error);
+      clients.delete(ws);
+    });
+  });
+  
+  // Function to broadcast updates to all connected clients
+  const broadcastUpdate = (type: string, data: any) => {
+    const message = JSON.stringify({ type, data });
+    clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  };
+  
+  // Export broadcast function for use in storage operations
+  (global as any).broadcastUpdate = broadcastUpdate;
+  
   return httpServer;
 }

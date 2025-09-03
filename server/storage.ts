@@ -220,7 +220,14 @@ export class MongoStorage implements IStorage {
         updatedAt: new Date()
       };
       const result = await collection.insertOne(newProperty);
-      return { ...newProperty, _id: result.insertedId.toString() };
+      const createdProperty = { ...newProperty, _id: result.insertedId.toString() };
+      
+      // Broadcast real-time update
+      if ((global as any).broadcastUpdate) {
+        (global as any).broadcastUpdate('property_created', createdProperty);
+      }
+      
+      return createdProperty;
     } catch (error) {
       console.error('Error creating property:', error);
       throw error;
@@ -236,6 +243,11 @@ export class MongoStorage implements IStorage {
         { $set: updateData },
         { returnDocument: 'after' }
       );
+      
+      if (result.value && (global as any).broadcastUpdate) {
+        (global as any).broadcastUpdate('property_updated', result.value);
+      }
+      
       return result.value || undefined;
     } catch (error) {
       console.error('Error updating property:', error);

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/lib/auth'
+import { useWebSocket } from '@/hooks/use-websocket'
 import AdminSidebar from '@/components/admin/sidebar'
 import PropertyForm from '@/components/admin/property-form'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,9 @@ import type { Property } from '@shared/schema'
 export default function AdminProperties() {
   const { isAuthenticated } = useAuth()
   const { toast } = useToast()
+  
+  // Connect to WebSocket for real-time updates
+  useWebSocket()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [propertyTypeFilter, setPropertyTypeFilter] = useState('')
