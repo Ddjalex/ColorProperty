@@ -1,17 +1,6 @@
-import { db } from './db.js';
-import { eq, desc, and, like, gte, lte, ilike } from 'drizzle-orm';
+import { getCollection } from './db.js';
+import { ObjectId } from 'mongodb';
 import bcrypt from 'bcrypt';
-
-import { 
-  users,
-  properties,
-  projects,
-  constructionUpdates,
-  blogPosts,
-  teamMembers,
-  leads,
-  settings
-} from "@shared/schema";
 
 import type { 
   User, 
@@ -29,17 +18,16 @@ import type {
   Lead,
   InsertLead,
   Settings,
-  InsertSettings,
-  Json
+  InsertSettings
 } from "@shared/schema";
 
 export interface IStorage {
   // User methods
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
-  deleteUser(id: number): Promise<boolean>;
+  updateUser(id: string, user: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
 
   // Property methods
   getProperties(filters?: any): Promise<Property[]>;
@@ -89,12 +77,13 @@ export interface IStorage {
   updateSettings(settings: Partial<Settings>): Promise<Settings>;
 }
 
-export class PostgreSQLStorage implements IStorage {
+export class MongoStorage implements IStorage {
   // User methods
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     try {
-      const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
-      return result[0] || undefined;
+      const collection = await getCollection('users');
+      const user = await collection.findOne({ _id: new ObjectId(id) });
+      return user || undefined;
     } catch (error) {
       console.error('Error getting user:', error);
       return undefined;
@@ -103,8 +92,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     try {
-      const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
-      return result[0] || undefined;
+      const collection = await getCollection('users');
+      const user = await collection.findOne({ email });
+      return user || undefined;
     } catch (error) {
       console.error('Error getting user by email:', error);
       return undefined;
@@ -112,32 +102,41 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
+    const collection = await getCollection('users');
     const hashedPassword = await bcrypt.hash(user.passwordHash, 10);
-    const result = await db.insert(users).values({
+    const newUser = {
       ...user,
       passwordHash: hashedPassword,
-    }).returning();
-    return result[0];
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newUser);
+    return { ...newUser, _id: result.insertedId.toString() };
   }
 
-  async updateUser(id: number, user: Partial<User>): Promise<User | undefined> {
+  async updateUser(id: string, user: Partial<User>): Promise<User | undefined> {
     try {
-      const updateData = { ...user };
+      const collection = await getCollection('users');
+      const updateData = { ...user, updatedAt: new Date() };
       if (updateData.passwordHash) {
         updateData.passwordHash = await bcrypt.hash(updateData.passwordHash, 10);
       }
-      const result = await db.update(users).set(updateData).where(eq(users.id, id)).returning();
-      return result[0] || undefined;
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating user:', error);
       return undefined;
     }
   }
 
-  async deleteUser(id: number): Promise<boolean> {
+  async deleteUser(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(users).where(eq(users.id, id));
-      return result.rowCount > 0;
+      const collection = await getCollection('users');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting user:', error);
       return false;
@@ -147,39 +146,34 @@ export class PostgreSQLStorage implements IStorage {
   // Property methods
   async getProperties(filters: any = {}): Promise<Property[]> {
     try {
-      let query = db.select().from(properties);
-      const conditions = [];
-
+      const collection = await getCollection('properties');
+      const query: any = {};
+      
       if (filters.location) {
-        conditions.push(ilike(properties.location, `%${filters.location}%`));
+        query.location = new RegExp(filters.location, 'i');
       }
       if (filters.propertyType) {
-        conditions.push(eq(properties.propertyType, filters.propertyType));
+        query.propertyType = filters.propertyType;
       }
       if (filters.bedrooms) {
-        conditions.push(gte(properties.bedrooms, parseInt(filters.bedrooms)));
+        query.bedrooms = { $gte: parseInt(filters.bedrooms) };
       }
       if (filters.status) {
-        conditions.push(eq(properties.status, filters.status));
+        query.status = filters.status;
       }
       if (filters.minPrice) {
-        conditions.push(gte(properties.priceETB, filters.minPrice));
+        query.priceETB = { $gte: parseInt(filters.minPrice) };
       }
       if (filters.maxPrice) {
-        conditions.push(lte(properties.priceETB, filters.maxPrice));
+        if (query.priceETB) {
+          query.priceETB.$lte = parseInt(filters.maxPrice);
+        } else {
+          query.priceETB = { $lte: parseInt(filters.maxPrice) };
+        }
       }
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
-
-      const result = await query.orderBy(desc(properties.createdAt));
-      return result.map(row => ({
-        ...row,
-        amenities: row.amenities as Json,
-        images: row.images as Json,
-        coordinates: row.coordinates as Json
-      }));
+      const properties = await collection.find(query).sort({ createdAt: -1 }).toArray();
+      return properties;
     } catch (error) {
       console.error('Error getting properties:', error);
       return [];
@@ -188,15 +182,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getProperty(id: string): Promise<Property | undefined> {
     try {
-      const result = await db.select().from(properties).where(eq(properties.id, parseInt(id))).limit(1);
-      const property = result[0];
-      if (!property) return undefined;
-      return {
-        ...property,
-        amenities: property.amenities as Json,
-        images: property.images as Json,
-        coordinates: property.coordinates as Json
-      };
+      const collection = await getCollection('properties');
+      const property = await collection.findOne({ _id: new ObjectId(id) });
+      return property || undefined;
     } catch (error) {
       console.error('Error getting property:', error);
       return undefined;
@@ -205,15 +193,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getPropertyBySlug(slug: string): Promise<Property | undefined> {
     try {
-      const result = await db.select().from(properties).where(eq(properties.slug, slug)).limit(1);
-      const property = result[0];
-      if (!property) return undefined;
-      return {
-        ...property,
-        amenities: property.amenities as Json,
-        images: property.images as Json,
-        coordinates: property.coordinates as Json
-      };
+      const collection = await getCollection('properties');
+      const property = await collection.findOne({ slug });
+      return property || undefined;
     } catch (error) {
       console.error('Error getting property by slug:', error);
       return undefined;
@@ -221,14 +203,26 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    const result = await db.insert(properties).values(property).returning();
-    return result[0];
+    const collection = await getCollection('properties');
+    const newProperty = {
+      ...property,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await collection.insertOne(newProperty);
+    return { ...newProperty, _id: result.insertedId.toString() };
   }
 
   async updateProperty(id: string, property: Partial<Property>): Promise<Property | undefined> {
     try {
-      const result = await db.update(properties).set(property).where(eq(properties.id, parseInt(id))).returning();
-      return result[0] || undefined;
+      const collection = await getCollection('properties');
+      const updateData = { ...property, updatedAt: new Date() };
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating property:', error);
       return undefined;
@@ -237,8 +231,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async deleteProperty(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(properties).where(eq(properties.id, parseInt(id)));
-      return result.rowCount > 0;
+      const collection = await getCollection('properties');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting property:', error);
       return false;
@@ -247,15 +242,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getFeaturedProperties(): Promise<Property[]> {
     try {
-      const result = await db.select().from(properties)
-        .where(and(eq(properties.featured, true), eq(properties.status, 'active')))
-        .limit(6);
-      return result.map(row => ({
-        ...row,
-        amenities: row.amenities as Json,
-        images: row.images as Json,
-        coordinates: row.coordinates as Json
-      }));
+      const collection = await getCollection('properties');
+      const properties = await collection.find({ featured: true, status: 'active' }).limit(6).toArray();
+      return properties;
     } catch (error) {
       console.error('Error getting featured properties:', error);
       return [];
@@ -265,11 +254,9 @@ export class PostgreSQLStorage implements IStorage {
   // Project methods
   async getProjects(): Promise<Project[]> {
     try {
-      const result = await db.select().from(projects).orderBy(desc(projects.createdAt));
-      return result.map(row => ({
-        ...row,
-        images: row.images as Json
-      }));
+      const collection = await getCollection('projects');
+      const projects = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      return projects;
     } catch (error) {
       console.error('Error getting projects:', error);
       return [];
@@ -278,13 +265,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getProject(id: string): Promise<Project | undefined> {
     try {
-      const result = await db.select().from(projects).where(eq(projects.id, parseInt(id))).limit(1);
-      const project = result[0];
-      if (!project) return undefined;
-      return {
-        ...project,
-        images: project.images as Json
-      };
+      const collection = await getCollection('projects');
+      const project = await collection.findOne({ _id: new ObjectId(id) });
+      return project || undefined;
     } catch (error) {
       console.error('Error getting project:', error);
       return undefined;
@@ -292,14 +275,24 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    const result = await db.insert(projects).values(project).returning();
-    return result[0];
+    const collection = await getCollection('projects');
+    const newProject = {
+      ...project,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newProject);
+    return { ...newProject, _id: result.insertedId.toString() };
   }
 
   async updateProject(id: string, project: Partial<Project>): Promise<Project | undefined> {
     try {
-      const result = await db.update(projects).set(project).where(eq(projects.id, parseInt(id))).returning();
-      return result[0] || undefined;
+      const collection = await getCollection('projects');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: project },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating project:', error);
       return undefined;
@@ -308,8 +301,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async deleteProject(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(projects).where(eq(projects.id, parseInt(id)));
-      return result.rowCount > 0;
+      const collection = await getCollection('projects');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting project:', error);
       return false;
@@ -319,17 +313,10 @@ export class PostgreSQLStorage implements IStorage {
   // Construction Update methods
   async getConstructionUpdates(projectId?: string): Promise<ConstructionUpdate[]> {
     try {
-      let query = db.select().from(constructionUpdates);
-      
-      if (projectId) {
-        query = query.where(eq(constructionUpdates.projectId, parseInt(projectId)));
-      }
-      
-      const result = await query.orderBy(desc(constructionUpdates.publishedAt));
-      return result.map(row => ({
-        ...row,
-        images: row.images as Json
-      }));
+      const collection = await getCollection('construction_updates');
+      const query = projectId ? { projectId } : {};
+      const updates = await collection.find(query).sort({ publishedAt: -1 }).toArray();
+      return updates;
     } catch (error) {
       console.error('Error getting construction updates:', error);
       return [];
@@ -337,14 +324,24 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createConstructionUpdate(update: InsertConstructionUpdate): Promise<ConstructionUpdate> {
-    const result = await db.insert(constructionUpdates).values(update).returning();
-    return result[0];
+    const collection = await getCollection('construction_updates');
+    const newUpdate = {
+      ...update,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newUpdate);
+    return { ...newUpdate, _id: result.insertedId.toString() };
   }
 
   async updateConstructionUpdate(id: string, update: Partial<ConstructionUpdate>): Promise<ConstructionUpdate | undefined> {
     try {
-      const result = await db.update(constructionUpdates).set(update).where(eq(constructionUpdates.id, parseInt(id))).returning();
-      return result[0] || undefined;
+      const collection = await getCollection('construction_updates');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: update },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating construction update:', error);
       return undefined;
@@ -353,8 +350,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async deleteConstructionUpdate(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(constructionUpdates).where(eq(constructionUpdates.id, parseInt(id)));
-      return result.rowCount > 0;
+      const collection = await getCollection('construction_updates');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting construction update:', error);
       return false;
@@ -364,17 +362,10 @@ export class PostgreSQLStorage implements IStorage {
   // Blog methods
   async getBlogPosts(status?: string): Promise<BlogPost[]> {
     try {
-      let query = db.select().from(blogPosts);
-      
-      if (status) {
-        query = query.where(eq(blogPosts.status, status));
-      }
-      
-      const result = await query.orderBy(desc(blogPosts.publishedAt));
-      return result.map(row => ({
-        ...row,
-        tags: row.tags as Json
-      }));
+      const collection = await getCollection('blog_posts');
+      const query = status ? { status } : {};
+      const posts = await collection.find(query).sort({ publishedAt: -1 }).toArray();
+      return posts;
     } catch (error) {
       console.error('Error getting blog posts:', error);
       return [];
@@ -383,13 +374,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getBlogPost(id: string): Promise<BlogPost | undefined> {
     try {
-      const result = await db.select().from(blogPosts).where(eq(blogPosts.id, parseInt(id))).limit(1);
-      const post = result[0];
-      if (!post) return undefined;
-      return {
-        ...post,
-        tags: post.tags as Json
-      };
+      const collection = await getCollection('blog_posts');
+      const post = await collection.findOne({ _id: new ObjectId(id) });
+      return post || undefined;
     } catch (error) {
       console.error('Error getting blog post:', error);
       return undefined;
@@ -398,13 +385,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getBlogPostBySlug(slug: string): Promise<BlogPost | undefined> {
     try {
-      const result = await db.select().from(blogPosts).where(eq(blogPosts.slug, slug)).limit(1);
-      const post = result[0];
-      if (!post) return undefined;
-      return {
-        ...post,
-        tags: post.tags as Json
-      };
+      const collection = await getCollection('blog_posts');
+      const post = await collection.findOne({ slug });
+      return post || undefined;
     } catch (error) {
       console.error('Error getting blog post by slug:', error);
       return undefined;
@@ -412,14 +395,26 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createBlogPost(post: InsertBlogPost): Promise<BlogPost> {
-    const result = await db.insert(blogPosts).values(post).returning();
-    return result[0];
+    const collection = await getCollection('blog_posts');
+    const newPost = {
+      ...post,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await collection.insertOne(newPost);
+    return { ...newPost, _id: result.insertedId.toString() };
   }
 
   async updateBlogPost(id: string, post: Partial<BlogPost>): Promise<BlogPost | undefined> {
     try {
-      const result = await db.update(blogPosts).set(post).where(eq(blogPosts.id, parseInt(id))).returning();
-      return result[0] || undefined;
+      const collection = await getCollection('blog_posts');
+      const updateData = { ...post, updatedAt: new Date() };
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating blog post:', error);
       return undefined;
@@ -428,8 +423,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async deleteBlogPost(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(blogPosts).where(eq(blogPosts.id, parseInt(id)));
-      return result.rowCount > 0;
+      const collection = await getCollection('blog_posts');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting blog post:', error);
       return false;
@@ -439,8 +435,9 @@ export class PostgreSQLStorage implements IStorage {
   // Team methods
   async getTeamMembers(): Promise<TeamMember[]> {
     try {
-      const result = await db.select().from(teamMembers).orderBy(teamMembers.order);
-      return result;
+      const collection = await getCollection('team_members');
+      const members = await collection.find({}).sort({ order: 1 }).toArray();
+      return members;
     } catch (error) {
       console.error('Error getting team members:', error);
       return [];
@@ -449,8 +446,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async getTeamMember(id: string): Promise<TeamMember | undefined> {
     try {
-      const result = await db.select().from(teamMembers).where(eq(teamMembers.id, parseInt(id))).limit(1);
-      return result[0] || undefined;
+      const collection = await getCollection('team_members');
+      const member = await collection.findOne({ _id: new ObjectId(id) });
+      return member || undefined;
     } catch (error) {
       console.error('Error getting team member:', error);
       return undefined;
@@ -458,14 +456,24 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createTeamMember(member: InsertTeamMember): Promise<TeamMember> {
-    const result = await db.insert(teamMembers).values(member).returning();
-    return result[0];
+    const collection = await getCollection('team_members');
+    const newMember = {
+      ...member,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newMember);
+    return { ...newMember, _id: result.insertedId.toString() };
   }
 
   async updateTeamMember(id: string, member: Partial<TeamMember>): Promise<TeamMember | undefined> {
     try {
-      const result = await db.update(teamMembers).set(member).where(eq(teamMembers.id, parseInt(id))).returning();
-      return result[0] || undefined;
+      const collection = await getCollection('team_members');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: member },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating team member:', error);
       return undefined;
@@ -474,8 +482,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async deleteTeamMember(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(teamMembers).where(eq(teamMembers.id, parseInt(id)));
-      return result.rowCount > 0;
+      const collection = await getCollection('team_members');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting team member:', error);
       return false;
@@ -485,8 +494,9 @@ export class PostgreSQLStorage implements IStorage {
   // Lead methods
   async getLeads(): Promise<Lead[]> {
     try {
-      const result = await db.select().from(leads).orderBy(desc(leads.createdAt));
-      return result;
+      const collection = await getCollection('leads');
+      const leads = await collection.find({}).sort({ createdAt: -1 }).toArray();
+      return leads;
     } catch (error) {
       console.error('Error getting leads:', error);
       return [];
@@ -494,14 +504,24 @@ export class PostgreSQLStorage implements IStorage {
   }
 
   async createLead(lead: InsertLead): Promise<Lead> {
-    const result = await db.insert(leads).values(lead).returning();
-    return result[0];
+    const collection = await getCollection('leads');
+    const newLead = {
+      ...lead,
+      createdAt: new Date()
+    };
+    const result = await collection.insertOne(newLead);
+    return { ...newLead, _id: result.insertedId.toString() };
   }
 
   async updateLead(id: string, lead: Partial<Lead>): Promise<Lead | undefined> {
     try {
-      const result = await db.update(leads).set(lead).where(eq(leads.id, parseInt(id))).returning();
-      return result[0] || undefined;
+      const collection = await getCollection('leads');
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: lead },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
     } catch (error) {
       console.error('Error updating lead:', error);
       return undefined;
@@ -510,8 +530,9 @@ export class PostgreSQLStorage implements IStorage {
 
   async deleteLead(id: string): Promise<boolean> {
     try {
-      const result = await db.delete(leads).where(eq(leads.id, parseInt(id)));
-      return result.rowCount > 0;
+      const collection = await getCollection('leads');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
     } catch (error) {
       console.error('Error deleting lead:', error);
       return false;
@@ -521,25 +542,25 @@ export class PostgreSQLStorage implements IStorage {
   // Settings methods
   async getSettings(): Promise<Settings | undefined> {
     try {
-      const result = await db.select().from(settings).limit(1);
-      return result[0] || undefined;
+      const collection = await getCollection('settings');
+      const settings = await collection.findOne({});
+      return settings || undefined;
     } catch (error) {
       console.error('Error getting settings:', error);
       return undefined;
     }
   }
 
-  async updateSettings(settingsData: Partial<Settings>): Promise<Settings> {
-    const existingSettings = await this.getSettings();
-    
-    if (existingSettings) {
-      const result = await db.update(settings).set(settingsData).where(eq(settings.id, existingSettings.id)).returning();
-      return result[0];
-    } else {
-      const result = await db.insert(settings).values(settingsData as InsertSettings).returning();
-      return result[0];
-    }
+  async updateSettings(settings: Partial<Settings>): Promise<Settings> {
+    const collection = await getCollection('settings');
+    const updateData = { ...settings, updatedAt: new Date() };
+    const result = await collection.findOneAndUpdate(
+      {},
+      { $set: updateData },
+      { upsert: true, returnDocument: 'after' }
+    );
+    return result.value;
   }
 }
 
-export const storage = new PostgreSQLStorage();
+export const storage = new MongoStorage();
