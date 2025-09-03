@@ -122,11 +122,10 @@ export default function PropertyCard({ property }: PropertyCardProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="flex items-center space-x-1"
+                className="p-2"
                 data-testid={`button-view-details-${property._id}`}
               >
                 <Eye className="h-4 w-4" />
-                <span>View</span>
               </Button>
             </Link>
             <a 
