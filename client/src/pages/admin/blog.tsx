@@ -36,7 +36,7 @@ export default function AdminBlog() {
       post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
     
-    const matchesStatus = !statusFilter || post.status === statusFilter
+    const matchesStatus = !statusFilter || statusFilter === 'all' || post.status === statusFilter
     
     return matchesSearch && matchesStatus
   })
@@ -129,7 +129,7 @@ export default function AdminBlog() {
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
                   <SelectItem value="draft">Draft</SelectItem>
                 </SelectContent>
@@ -139,7 +139,7 @@ export default function AdminBlog() {
                 variant="outline"
                 onClick={() => {
                   setSearchTerm('')
-                  setStatusFilter('')
+                  setStatusFilter('all')
                 }}
                 data-testid="button-clear-filters"
               >

@@ -36,8 +36,8 @@ export default function AdminProperties() {
       property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       property.location.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesStatus = !statusFilter || property.status === statusFilter
-    const matchesType = !propertyTypeFilter || property.propertyType === propertyTypeFilter
+    const matchesStatus = !statusFilter || statusFilter === 'all-status' || property.status === statusFilter
+    const matchesType = !propertyTypeFilter || propertyTypeFilter === 'all-types' || property.propertyType === propertyTypeFilter
     
     return matchesSearch && matchesStatus && matchesType
   })
@@ -130,7 +130,7 @@ export default function AdminProperties() {
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Status</SelectItem>
+                  <SelectItem value="all-status">All Status</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="draft">Draft</SelectItem>
                   <SelectItem value="sold">Sold</SelectItem>
@@ -143,7 +143,7 @@ export default function AdminProperties() {
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all-types">All Types</SelectItem>
                   <SelectItem value="apartment">Apartment</SelectItem>
                   <SelectItem value="house">House</SelectItem>
                   <SelectItem value="commercial">Commercial</SelectItem>
@@ -156,8 +156,8 @@ export default function AdminProperties() {
                 variant="outline"
                 onClick={() => {
                   setSearchTerm('')
-                  setStatusFilter('')
-                  setPropertyTypeFilter('')
+                  setStatusFilter('all-status')
+                  setPropertyTypeFilter('all-types')
                 }}
                 data-testid="button-clear-filters"
               >

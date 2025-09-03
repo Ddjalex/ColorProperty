@@ -34,7 +34,7 @@ export default function AdminTeam() {
       member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (member.specialization && member.specialization.toLowerCase().includes(searchTerm.toLowerCase()))
     
-    const matchesRole = !roleFilter || member.roleType === roleFilter
+    const matchesRole = !roleFilter || roleFilter === 'all' || member.roleType === roleFilter
     
     return matchesSearch && matchesRole
   })
@@ -127,7 +127,7 @@ export default function AdminTeam() {
                   <SelectValue placeholder="All Roles" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Roles</SelectItem>
+                  <SelectItem value="all">All Roles</SelectItem>
                   <SelectItem value="officer">Sales Officers</SelectItem>
                   <SelectItem value="agent">Sales Agents</SelectItem>
                 </SelectContent>
@@ -137,7 +137,7 @@ export default function AdminTeam() {
                 variant="outline"
                 onClick={() => {
                   setSearchTerm('')
-                  setRoleFilter('')
+                  setRoleFilter('all')
                 }}
                 data-testid="button-clear-filters"
               >

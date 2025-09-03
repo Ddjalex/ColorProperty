@@ -29,7 +29,7 @@ export default function AdminLeads() {
       (lead.email && lead.email.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (lead.phone && lead.phone.includes(searchTerm))
     
-    const matchesType = !typeFilter || lead.type === typeFilter
+    const matchesType = !typeFilter || typeFilter === 'all' || lead.type === typeFilter
     
     return matchesSearch && matchesType
   })
@@ -130,7 +130,7 @@ export default function AdminLeads() {
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="contact">Contact Form</SelectItem>
                   <SelectItem value="schedule">Schedule Viewing</SelectItem>
                 </SelectContent>
@@ -140,7 +140,7 @@ export default function AdminLeads() {
                 variant="outline"
                 onClick={() => {
                   setSearchTerm('')
-                  setTypeFilter('')
+                  setTypeFilter('all')
                 }}
                 data-testid="button-clear-filters"
               >
