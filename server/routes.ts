@@ -7,7 +7,8 @@ import {
   insertBlogPostSchema, 
   insertTeamMemberSchema, 
   insertLeadSchema,
-  insertUserSchema
+  insertUserSchema,
+  insertHeroSlideSchema
 } from "@shared/schema";
 
 import bcrypt from 'bcrypt';
@@ -266,6 +267,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(settings);
     } catch (error) {
       res.status(400).json({ message: 'Failed to update settings' });
+    }
+  });
+
+  // Hero Slides routes
+  app.get('/api/hero-slides', async (req, res) => {
+    try {
+      const slides = await storage.getHeroSlides();
+      res.json(slides);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch hero slides' });
+    }
+  });
+
+  app.get('/api/hero-slides/:id', async (req, res) => {
+    try {
+      const slide = await storage.getHeroSlide(req.params.id);
+      if (!slide) {
+        return res.status(404).json({ message: 'Hero slide not found' });
+      }
+      res.json(slide);
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to fetch hero slide' });
+    }
+  });
+
+  app.post('/api/hero-slides', requireAuth, async (req, res) => {
+    try {
+      const slideData = insertHeroSlideSchema.parse(req.body);
+      const slide = await storage.createHeroSlide(slideData);
+      res.json(slide);
+    } catch (error) {
+      res.status(400).json({ message: 'Failed to create hero slide' });
+    }
+  });
+
+  app.put('/api/hero-slides/:id', requireAuth, async (req, res) => {
+    try {
+      const slide = await storage.updateHeroSlide(req.params.id, req.body);
+      if (!slide) {
+        return res.status(404).json({ message: 'Hero slide not found' });
+      }
+      res.json(slide);
+    } catch (error) {
+      res.status(400).json({ message: 'Failed to update hero slide' });
+    }
+  });
+
+  app.delete('/api/hero-slides/:id', requireAuth, async (req, res) => {
+    try {
+      const success = await storage.deleteHeroSlide(req.params.id);
+      if (!success) {
+        return res.status(404).json({ message: 'Hero slide not found' });
+      }
+      res.json({ message: 'Hero slide deleted successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to delete hero slide' });
     }
   });
 

@@ -131,6 +131,24 @@ export const insertLeadSchema = leadSchema.omit({ _id: true, createdAt: true });
 export type Lead = z.infer<typeof leadSchema>;
 export type InsertLead = z.infer<typeof insertLeadSchema>;
 
+// Hero Slide schema
+export const heroSlideSchema = z.object({
+  _id: z.string().optional(),
+  title: z.string(),
+  subtitle: z.string(),
+  imageUrl: z.string(),
+  ctaText: z.string().optional(),
+  ctaLink: z.string().optional(),
+  order: z.number().default(0),
+  isActive: z.boolean().default(true),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+});
+
+export const insertHeroSlideSchema = heroSlideSchema.omit({ _id: true, createdAt: true, updatedAt: true });
+export type HeroSlide = z.infer<typeof heroSlideSchema>;
+export type InsertHeroSlide = z.infer<typeof insertHeroSlideSchema>;
+
 // Settings schema
 export const settingsSchema = z.object({
   _id: z.string().optional(),

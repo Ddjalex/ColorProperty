@@ -10,7 +10,8 @@ import {
   MessageSquare, 
   Settings, 
   LogOut,
-  Home
+  Home,
+  Image
 } from 'lucide-react'
 
 export default function AdminSidebar() {
@@ -20,6 +21,7 @@ export default function AdminSidebar() {
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Properties', href: '/admin/properties', icon: Building },
+    { name: 'Hero Slides', href: '/admin/hero-slides', icon: Image },
     { name: 'Team', href: '/admin/team', icon: Users },
     { name: 'Blog', href: '/admin/blog', icon: FileText },
     { name: 'Leads', href: '/admin/leads', icon: MessageSquare },

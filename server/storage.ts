@@ -18,7 +18,9 @@ import type {
   Lead,
   InsertLead,
   Settings,
-  InsertSettings
+  InsertSettings,
+  HeroSlide,
+  InsertHeroSlide
 } from "@shared/schema";
 
 export interface IStorage {
@@ -75,6 +77,13 @@ export interface IStorage {
   // Settings methods
   getSettings(): Promise<Settings | undefined>;
   updateSettings(settings: Partial<Settings>): Promise<Settings>;
+
+  // Hero Slide methods
+  getHeroSlides(): Promise<HeroSlide[]>;
+  getHeroSlide(id: string): Promise<HeroSlide | undefined>;
+  createHeroSlide(slide: InsertHeroSlide): Promise<HeroSlide>;
+  updateHeroSlide(id: string, slide: Partial<HeroSlide>): Promise<HeroSlide | undefined>;
+  deleteHeroSlide(id: string): Promise<boolean>;
 }
 
 export class MongoStorage implements IStorage {
@@ -560,6 +569,67 @@ export class MongoStorage implements IStorage {
       { upsert: true, returnDocument: 'after' }
     );
     return result.value;
+  }
+
+  // Hero Slide methods
+  async getHeroSlides(): Promise<HeroSlide[]> {
+    try {
+      const collection = await getCollection('hero_slides');
+      const slides = await collection.find({}).sort({ order: 1, createdAt: -1 }).toArray();
+      return slides;
+    } catch (error) {
+      console.error('Error getting hero slides:', error);
+      return [];
+    }
+  }
+
+  async getHeroSlide(id: string): Promise<HeroSlide | undefined> {
+    try {
+      const collection = await getCollection('hero_slides');
+      const slide = await collection.findOne({ _id: new ObjectId(id) });
+      return slide || undefined;
+    } catch (error) {
+      console.error('Error getting hero slide:', error);
+      return undefined;
+    }
+  }
+
+  async createHeroSlide(slide: InsertHeroSlide): Promise<HeroSlide> {
+    const collection = await getCollection('hero_slides');
+    const newSlide = {
+      ...slide,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const result = await collection.insertOne(newSlide);
+    return { ...newSlide, _id: result.insertedId.toString() };
+  }
+
+  async updateHeroSlide(id: string, slide: Partial<HeroSlide>): Promise<HeroSlide | undefined> {
+    try {
+      const collection = await getCollection('hero_slides');
+      const updateData = { ...slide, updatedAt: new Date() };
+      const result = await collection.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { returnDocument: 'after' }
+      );
+      return result.value || undefined;
+    } catch (error) {
+      console.error('Error updating hero slide:', error);
+      return undefined;
+    }
+  }
+
+  async deleteHeroSlide(id: string): Promise<boolean> {
+    try {
+      const collection = await getCollection('hero_slides');
+      const result = await collection.deleteOne({ _id: new ObjectId(id) });
+      return result.deletedCount > 0;
+    } catch (error) {
+      console.error('Error deleting hero slide:', error);
+      return false;
+    }
   }
 }
 

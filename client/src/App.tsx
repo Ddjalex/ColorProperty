@@ -14,6 +14,7 @@ import Contact from "@/pages/contact";
 import Login from "@/pages/login";
 import AdminDashboard from "@/pages/admin/dashboard";
 import AdminProperties from "@/pages/admin/properties";
+import AdminHeroSlides from "@/pages/admin/hero-slides";
 import AdminTeam from "@/pages/admin/team";
 import AdminBlog from "@/pages/admin/blog";
 import AdminLeads from "@/pages/admin/leads";
@@ -33,6 +34,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin/properties" component={AdminProperties} />
+      <Route path="/admin/hero-slides" component={AdminHeroSlides} />
       <Route path="/admin/team" component={AdminTeam} />
       <Route path="/admin/blog" component={AdminBlog} />
       <Route path="/admin/leads" component={AdminLeads} />
