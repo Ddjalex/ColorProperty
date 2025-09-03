@@ -93,8 +93,8 @@ export default function PropertyDetail() {
       
       <div className="container mx-auto px-4 py-8">
         {/* Image Gallery */}
-        <div className="relative mb-8">
-          <div className="h-96 md:h-[500px] bg-cover bg-center rounded-xl overflow-hidden">
+        <div className="relative mb-6">
+          <div className="h-64 md:h-80 bg-cover bg-center rounded-xl overflow-hidden">
             <img 
               src={getImageUrl(property.images[0])} 
               alt={property.title}
