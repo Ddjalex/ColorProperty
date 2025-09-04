@@ -106,11 +106,13 @@ export default function PropertyDetail() {
       
       <div className="container mx-auto px-4 py-6">
         {/* Image Gallery */}
-        <div className="relative mb-6">
-          <PropertyImageSlider 
-            property={property} 
-            className="h-48 md:h-64"
-          />
+        <div className="relative mb-6 max-w-2xl mx-auto">
+          <div className="aspect-video overflow-hidden rounded-lg bg-gray-100">
+            <PropertyImageSlider 
+              property={property} 
+              className="h-full w-full object-cover"
+            />
+          </div>
           
           {/* Status Badge */}
           <div className="absolute top-4 left-4">
