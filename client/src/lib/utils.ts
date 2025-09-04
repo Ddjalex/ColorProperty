@@ -64,5 +64,7 @@ export function getImageUrl(url: string, index: number = 0): string {
 // New function to get real property images from the database
 export function getPropertyImageUrl(propertyId: string, imageIndex: number = 0): string {
   if (!propertyId) return placeholderImages[imageIndex % placeholderImages.length]
-  return `/api/properties/${propertyId}/images/${imageIndex}`
+  // Add cache busting parameter to ensure fresh images after updates
+  const cacheBuster = Math.floor(Date.now() / 60000) // Changes every minute
+  return `/api/properties/${propertyId}/images/${imageIndex}?v=${cacheBuster}`
 }

@@ -38,7 +38,17 @@ export function useWebSocket() {
                 queryClient.refetchQueries({ queryKey: ['/api/properties'] })
                 queryClient.refetchQueries({ queryKey: ['/api/properties/featured'] })
                 
-                console.log(`Real-time update: ${message.type}`)
+                // Force image cache refresh by reloading all property images on the page
+                setTimeout(() => {
+                  const images = document.querySelectorAll('img[src*="/api/properties/"]')
+                  images.forEach((img: any) => {
+                    const src = img.src
+                    img.src = ''
+                    img.src = src.split('?')[0] + '?v=' + Date.now()
+                  })
+                }, 100)
+                
+                console.log(`Real-time update: ${message.type} - Images refreshed`)
                 break
               case 'property_deleted':
                 // Handle property deletions
