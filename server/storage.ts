@@ -730,15 +730,43 @@ export class MongoStorage implements IStorage {
   async updateHeroSlide(id: string, slide: Partial<HeroSlide>): Promise<HeroSlide | undefined> {
     try {
       const collection = await getCollection('hero_slides');
+      
+      // Enhanced ObjectId validation
+      if (!ObjectId.isValid(id)) {
+        console.log('Invalid ObjectId format for hero slide:', id);
+        return undefined;
+      }
+      
+      const objectId = new ObjectId(id);
+      console.log('Updating hero slide with ID:', id);
+      console.log('Update data:', JSON.stringify(slide, null, 2));
+      
+      // First check if the slide exists
+      const existingSlide = await collection.findOne({ _id: objectId });
+      if (!existingSlide) {
+        console.log('Hero slide not found with ID:', id);
+        return undefined;
+      }
+      
+      console.log('Found existing hero slide, proceeding with update');
+      
       const updateData = { ...slide, updatedAt: new Date() };
       const result = await collection.findOneAndUpdate(
-        { _id: new ObjectId(id) },
+        { _id: objectId },
         { $set: updateData },
         { returnDocument: 'after' }
       );
+      
+      if (result.value) {
+        console.log('Hero slide updated successfully for ID:', id);
+      } else {
+        console.log('Update operation completed but no document returned for ID:', id);
+      }
+      
       return result.value || undefined;
     } catch (error) {
       console.error('Error updating hero slide:', error);
+      console.error('ID that caused error:', id);
       return undefined;
     }
   }
