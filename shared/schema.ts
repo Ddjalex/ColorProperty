@@ -152,9 +152,29 @@ export type InsertHeroSlide = z.infer<typeof insertHeroSlideSchema>;
 // Settings schema
 export const settingsSchema = z.object({
   _id: z.string().optional(),
+  // Contact Information
   phoneNumber: z.string().default('0974408281'),
   whatsappNumber: z.string().default('0974408281'),
+  email: z.string().email().optional(),
+  supportEmail: z.string().email().optional(),
+  address: z.object({
+    street: z.string().optional(),
+    city: z.string().optional(),
+    region: z.string().optional(),
+    country: z.string().default('Ethiopia'),
+    postalCode: z.string().optional(),
+  }).default({}),
+  businessHours: z.object({
+    monday: z.string().default('9:00 AM - 6:00 PM'),
+    tuesday: z.string().default('9:00 AM - 6:00 PM'),
+    wednesday: z.string().default('9:00 AM - 6:00 PM'),
+    thursday: z.string().default('9:00 AM - 6:00 PM'),
+    friday: z.string().default('9:00 AM - 6:00 PM'),
+    saturday: z.string().default('9:00 AM - 4:00 PM'),
+    sunday: z.string().default('Closed'),
+  }).default({}),
   hotlineNumbers: z.array(z.string()).default([]),
+  // Social Media
   socialLinks: z.object({
     facebook: z.string().optional(),
     youtube: z.string().optional(),
@@ -163,7 +183,9 @@ export const settingsSchema = z.object({
     linkedin: z.string().optional(),
     telegram: z.string().optional(),
   }).default({}),
+  // Communication
   whatsappTemplate: z.string().default("I'm interested in {propertyTitle} - {propertyPrice}. Property link: {propertyLink}"),
+  // SEO
   seoDefaults: z.object({
     title: z.string().optional(),
     description: z.string().optional(),
