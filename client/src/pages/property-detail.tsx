@@ -109,7 +109,7 @@ export default function PropertyDetail() {
         <div className="relative mb-6">
           <PropertyImageSlider 
             property={property} 
-            className="h-64 md:h-80 lg:h-96"
+            className="h-48 md:h-64"
           />
           
           {/* Status Badge */}
