@@ -284,18 +284,41 @@ export class MongoStorage implements IStorage {
   async updateProperty(id: string, property: Partial<Property>): Promise<Property | undefined> {
     try {
       const collection = await getCollection('properties');
-      const updateData = { ...property, updatedAt: new Date() };
-      const result = await collection.findOneAndUpdate(
-        { _id: new ObjectId(id) },
-        { $set: updateData },
-        { returnDocument: 'after' }
-      );
-      
-      if (result.value && (global as any).broadcastUpdate) {
-        (global as any).broadcastUpdate('property_updated', result.value);
+      if (!ObjectId.isValid(id)) {
+        console.log('Invalid ObjectId format:', id);
+        return undefined;
       }
       
-      return result.value || undefined;
+      const objectId = new ObjectId(id);
+      const updateData = { ...property, updatedAt: new Date() };
+      
+      // First check if the property exists
+      const existingProperty = await collection.findOne({ _id: objectId });
+      if (!existingProperty) {
+        console.log('Property not found with ID:', id);
+        return undefined;
+      }
+      
+      // Perform the update
+      const updateResult = await collection.updateOne(
+        { _id: objectId },
+        { $set: updateData }
+      );
+      
+      if (updateResult.matchedCount === 0) {
+        console.log('No documents matched for update, ID:', id);
+        return undefined;
+      }
+      
+      // Fetch the updated document
+      const updatedProperty = await collection.findOne({ _id: objectId });
+      
+      if (updatedProperty && (global as any).broadcastUpdate) {
+        (global as any).broadcastUpdate('property_updated', updatedProperty);
+      }
+      
+      console.log('Property updated successfully for ID:', id);
+      return updatedProperty || undefined;
     } catch (error) {
       console.error('Error updating property:', error);
       return undefined;

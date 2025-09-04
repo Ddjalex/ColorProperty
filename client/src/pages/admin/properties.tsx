@@ -203,7 +203,7 @@ export default function AdminProperties() {
                         <td className="py-4">
                           <div className="flex items-center space-x-3">
                             <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
-                              {property.imageCount > 0 && (
+                              {(property.imageCount ?? 0) > 0 && (
                                 <img 
                                   src={getPropertyImageUrl(property._id!, 0)} 
                                   alt={property.title}
