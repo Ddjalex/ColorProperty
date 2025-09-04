@@ -61,9 +61,14 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border hover:shadow-lg transition-shadow" data-testid={`property-card-${property._id}`}>
       <div className="relative">
         <img 
-          src={getImageUrl(property.images[0])} 
+          src={getImageUrl(property.images?.[0])} 
           alt={property.title}
           className="w-full h-48 object-cover"
+          loading="lazy"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop';
+          }}
           data-testid={`property-image-${property._id}`}
         />
         <div className="absolute top-4 left-4">

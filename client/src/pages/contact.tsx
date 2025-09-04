@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { useToast } from '@/hooks/use-toast'
 import { apiRequest } from '@/lib/queryClient'
 import { MapPin, Phone, Mail, Clock, Facebook, Youtube, Instagram, Twitter, Linkedin, MessageCircle } from 'lucide-react'
-import type { InsertLead } from '@shared/schema'
+import type { InsertLead, Settings } from '@shared/schema'
 
 export default function Contact() {
   const { toast } = useToast()
@@ -20,6 +20,11 @@ export default function Contact() {
     phone: '',
     propertyType: '',
     message: ''
+  })
+
+  // Get settings data
+  const { data: settings } = useQuery<Settings>({
+    queryKey: ['/api/settings'],
   })
 
   const createLead = useMutation({
@@ -190,8 +195,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Office Address</h3>
                     <p className="text-muted-foreground">
-                      Bole Road, Near Edna Mall<br />
-                      Addis Ababa, Ethiopia
+                      {settings?.address?.street || 'Addis Ababa'}<br />
+                      {settings?.address?.city || 'Addis Ababa'}, {settings?.address?.country || 'Ethiopia'}
                     </p>
                   </div>
                 </div>
@@ -203,8 +208,9 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Phone Numbers</h3>
                     <p className="text-muted-foreground">
-                      +251-911-6033 (24/7 Hotline)<br />
-                      +251-911-123-456 (Office)
+                      {settings?.phoneNumber && `+${settings.phoneNumber.replace(/^\+?/, '')} (24/7 Hotline)`}<br />
+                      {settings?.whatsappNumber && settings.whatsappNumber !== settings.phoneNumber && 
+                        `+${settings.whatsappNumber.replace(/^\+?/, '')} (WhatsApp)`}
                     </p>
                   </div>
                 </div>
@@ -216,8 +222,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Email</h3>
                     <p className="text-muted-foreground">
-                      info@temerproperties.com<br />
-                      sales@temerproperties.com
+                      {settings?.email || 'info@temerproperties.com'}<br />
+                      {settings?.supportEmail && settings.supportEmail !== settings.email && settings.supportEmail}
                     </p>
                   </div>
                 </div>

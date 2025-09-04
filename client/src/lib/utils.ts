@@ -40,7 +40,7 @@ export function generateWhatsAppUrl(phone: string, message: string): string {
 }
 
 export function getImageUrl(url: string): string {
-  if (!url) return '/placeholder-property.jpg'
+  if (!url) return 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop'
   if (url.startsWith('http')) return url
   return url
 }

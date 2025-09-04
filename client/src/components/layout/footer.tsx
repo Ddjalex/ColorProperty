@@ -1,7 +1,13 @@
 import { Link } from 'wouter'
+import { useQuery } from '@tanstack/react-query'
 import { Building, Facebook, Youtube, Instagram, Twitter, Linkedin, MessageCircle } from 'lucide-react'
+import type { Settings } from '@shared/schema'
 
 export default function Footer() {
+  const { data: settings } = useQuery<Settings>({
+    queryKey: ['/api/settings'],
+  })
+
   return (
     <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
@@ -73,24 +79,24 @@ export default function Footer() {
               <div className="flex items-start space-x-3">
                 <div className="text-primary mt-1">📍</div>
                 <div>
-                  <p className="text-gray-400">Bole Road, Near Edna Mall</p>
-                  <p className="text-gray-400">Addis Ababa, Ethiopia</p>
+                  <p className="text-gray-400">{settings?.address?.street || 'Addis Ababa'}</p>
+                  <p className="text-gray-400">{settings?.address?.city || 'Addis Ababa'}, {settings?.address?.country || 'Ethiopia'}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="text-primary">📞</div>
-                <p className="text-gray-400">+251-911-6033</p>
+                <p className="text-gray-400">+{settings?.phoneNumber?.replace(/^\+?/, '') || '251961435054'}</p>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="text-primary">✉️</div>
-                <p className="text-gray-400">info@temerproperties.com</p>
+                <p className="text-gray-400">{settings?.email || 'info@temerproperties.com'}</p>
               </div>
             </div>
 
             {/* Hotline Banner */}
             <div className="bg-primary rounded-lg p-4 mt-6">
               <p className="text-center font-semibold">24/7 Hotline</p>
-              <p className="text-center text-xl font-bold">+251-911-6033</p>
+              <p className="text-center text-xl font-bold">+{settings?.phoneNumber?.replace(/^\+?/, '') || '251961435054'}</p>
             </div>
           </div>
         </div>
