@@ -116,15 +116,6 @@ export default function HeroSlider() {
                     {slide.ctaText}
                   </Button>
                 )}
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 text-lg"
-                  data-testid="button-schedule-tour"
-                  onClick={() => window.location.href = '/contact'}
-                >
-                  Contact Us
-                </Button>
               </div>
             </div>
           </div>
