@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { Link, useLocation } from 'wouter'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, Building, Heart } from 'lucide-react'
+import { Menu, Heart } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
+import temerLogo from '@assets/generated_images/Temer_Properties_company_logo_fc90819f.png'
 
 export default function Header() {
   const [location] = useLocation()
@@ -30,8 +31,12 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" data-testid="link-logo">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-                <Building className="text-white text-xl" />
+              <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center">
+                <img 
+                  src={temerLogo} 
+                  alt="Temer Properties Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-[#8bc34b]">Temer</h1>
