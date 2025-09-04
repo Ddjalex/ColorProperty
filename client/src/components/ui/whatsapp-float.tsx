@@ -12,10 +12,10 @@ export function WhatsAppFloat() {
     queryKey: ['/api/settings'],
   })
 
-  // Show button after user scrolls down a bit
+  // Show button after user scrolls down a bit or after a delay
   useEffect(() => {
     const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
+      if (window.pageYOffset > 200) {
         setIsVisible(true)
       } else {
         setIsVisible(false)
@@ -23,8 +23,16 @@ export function WhatsAppFloat() {
       }
     }
 
+    // Show button immediately after 2 seconds or when user scrolls
+    const timer = setTimeout(() => {
+      setIsVisible(true)
+    }, 2000)
+
     window.addEventListener('scroll', toggleVisibility)
-    return () => window.removeEventListener('scroll', toggleVisibility)
+    return () => {
+      window.removeEventListener('scroll', toggleVisibility)
+      clearTimeout(timer)
+    }
   }, [])
 
   const whatsappNumber = settings?.whatsappNumber || '0974408281'
