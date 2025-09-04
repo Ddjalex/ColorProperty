@@ -78,6 +78,8 @@ export function useAuth() {
       token: null,
       isLoading: false
     })
+    // Redirect to login page after logout
+    window.location.href = '/login'
   }
 
   const isAuthenticated = !!authState.token && !!authState.user

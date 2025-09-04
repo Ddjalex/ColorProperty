@@ -67,7 +67,13 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: (failureCount, error: any) => {
+        // Don't retry on authentication errors
+        if (error?.message?.includes('401')) {
+          return false
+        }
+        return failureCount < 3
+      },
     },
     mutations: {
       retry: false,

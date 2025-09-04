@@ -20,6 +20,7 @@ import AdminBlog from "@/pages/admin/blog";
 import AdminLeads from "@/pages/admin/leads";
 import AdminSettings from "@/pages/admin/settings";
 import NotFound from "@/pages/not-found";
+import ProtectedRoute from "@/components/auth/protected-route";
 
 function Router() {
   return (
@@ -32,13 +33,13 @@ function Router() {
       <Route path="/blog/:slug" component={BlogPost} />
       <Route path="/contact" component={Contact} />
       <Route path="/login" component={Login} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/properties" component={AdminProperties} />
-      <Route path="/admin/hero-slides" component={AdminHeroSlides} />
-      <Route path="/admin/team" component={AdminTeam} />
-      <Route path="/admin/blog" component={AdminBlog} />
-      <Route path="/admin/leads" component={AdminLeads} />
-      <Route path="/admin/settings" component={AdminSettings} />
+      <Route path="/admin" component={() => <ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/properties" component={() => <ProtectedRoute><AdminProperties /></ProtectedRoute>} />
+      <Route path="/admin/hero-slides" component={() => <ProtectedRoute><AdminHeroSlides /></ProtectedRoute>} />
+      <Route path="/admin/team" component={() => <ProtectedRoute><AdminTeam /></ProtectedRoute>} />
+      <Route path="/admin/blog" component={() => <ProtectedRoute><AdminBlog /></ProtectedRoute>} />
+      <Route path="/admin/leads" component={() => <ProtectedRoute><AdminLeads /></ProtectedRoute>} />
+      <Route path="/admin/settings" component={() => <ProtectedRoute><AdminSettings /></ProtectedRoute>} />
       <Route component={NotFound} />
     </Switch>
   );
