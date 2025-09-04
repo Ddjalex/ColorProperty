@@ -130,13 +130,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/properties/:id', requireAuth, async (req, res) => {
     try {
+      console.log('Updating property ID:', req.params.id);
+      console.log('Update data:', JSON.stringify(req.body, null, 2));
+      
       const property = await storage.updateProperty(req.params.id, req.body);
       if (!property) {
+        console.log('Property not found for ID:', req.params.id);
         return res.status(404).json({ message: 'Property not found' });
       }
+      console.log('Property updated successfully');
       res.json(property);
     } catch (error) {
-      res.status(400).json({ message: 'Failed to update property' });
+      console.error('Property update error:', error);
+      res.status(400).json({ 
+        message: 'Failed to update property', 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      });
     }
   });
 

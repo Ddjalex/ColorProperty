@@ -34,8 +34,8 @@ const propertyFormSchema = z.object({
   imageFiles: z.array(z.instanceof(File)).default([]),
   project: z.string().optional(),
   coordinates: z.object({
-    lat: z.number().optional(),
-    lng: z.number().optional(),
+    lat: z.number(),
+    lng: z.number(),
   }).optional(),
 })
 
@@ -127,13 +127,17 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
         }
       }
       
+      console.log('Submitting property data:', { ...submitData, images: '[images]' })
+      
       if (property) {
+        console.log('Updating property with ID:', property._id)
         await updateProperty.mutateAsync({ id: property._id!, ...submitData })
         toast({
           title: "Property Updated",
           description: "The property has been successfully updated.",
         })
       } else {
+        console.log('Creating new property')
         await createProperty.mutateAsync(submitData)
         toast({
           title: "Property Created",
@@ -142,9 +146,10 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
       }
       onSuccess?.()
     } catch (error) {
+      console.error('Property submission error:', error)
       toast({
         title: "Error",
-        description: "Failed to save property. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save property. Please try again.",
         variant: "destructive",
       })
     }
@@ -172,8 +177,8 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
   }
 
   const removeImage = (index: number) => {
-    const currentImages = form.getValues('images')
-    const currentFiles = form.getValues('imageFiles')
+    const currentImages = form.getValues('images') || []
+    const currentFiles = form.getValues('imageFiles') || []
     form.setValue('images', currentImages.filter((_, i) => i !== index))
     form.setValue('imageFiles', currentFiles.filter((_, i) => i !== index))
   }
@@ -183,8 +188,8 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
     if (!files) return
 
     setUploadError('')
-    const currentImages = form.getValues('images')
-    const currentFiles = form.getValues('imageFiles')
+    const currentImages = form.getValues('images') || []
+    const currentFiles = form.getValues('imageFiles') || []
 
     Array.from(files).forEach(file => {
       if (file.size > 5 * 1024 * 1024) {
@@ -201,11 +206,13 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
       const reader = new FileReader()
       reader.onload = (e) => {
         const result = e.target?.result as string
-        form.setValue('images', [...currentImages, result])
+        const updatedImages = form.getValues('images') || []
+        form.setValue('images', [...updatedImages, result])
       }
       reader.readAsDataURL(file)
       
-      form.setValue('imageFiles', [...currentFiles, file])
+      const updatedFiles = form.getValues('imageFiles') || []
+      form.setValue('imageFiles', [...updatedFiles, file])
     })
 
     // Reset the input
