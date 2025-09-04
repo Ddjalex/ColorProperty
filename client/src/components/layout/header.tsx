@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Menu, Heart } from 'lucide-react'
 import { useAuth } from '@/lib/auth'
-import temerLogo from '@assets/generated_images/Temer_Properties_company_logo_fc90819f.png'
+import temerLogo from '@assets/images (2)_1755853378467-D-9Sw1o__1757008681347.jpg'
 
 export default function Header() {
   const [location] = useLocation()
