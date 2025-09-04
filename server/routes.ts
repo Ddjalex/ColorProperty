@@ -209,7 +209,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/blog', requireAuth, async (req, res) => {
     try {
       console.log('Received blog post data:', req.body);
-      const postData = insertBlogPostSchema.parse(req.body);
+      
+      // Convert publishedAt string to Date object if present
+      const blogData = { ...req.body };
+      if (blogData.publishedAt && typeof blogData.publishedAt === 'string') {
+        blogData.publishedAt = new Date(blogData.publishedAt);
+      }
+      
+      const postData = insertBlogPostSchema.parse(blogData);
       console.log('Parsed blog post data:', postData);
       const post = await storage.createBlogPost(postData);
       res.json(post);
@@ -225,12 +232,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put('/api/blog/:id', requireAuth, async (req, res) => {
     try {
-      const post = await storage.updateBlogPost(req.params.id, req.body);
+      // Convert publishedAt string to Date object if present
+      const blogData = { ...req.body };
+      if (blogData.publishedAt && typeof blogData.publishedAt === 'string') {
+        blogData.publishedAt = new Date(blogData.publishedAt);
+      }
+      
+      const post = await storage.updateBlogPost(req.params.id, blogData);
       if (!post) {
         return res.status(404).json({ message: 'Blog post not found' });
       }
       res.json(post);
     } catch (error) {
+      console.error('Blog post update error:', error);
       res.status(400).json({ message: 'Failed to update blog post' });
     }
   });
