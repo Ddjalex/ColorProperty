@@ -2,15 +2,23 @@
 TEMER PROPERTIES - CPANEL DEPLOYMENT GUIDE
 ========================================
 
-📁 FOLDER STRUCTURE FOR CPANEL:
--------------------------------
+📁 COMPLETE PROJECT STRUCTURE:
+------------------------------
+This package includes EVERYTHING:
+✅ client/ - React source code (for development/backup)
+✅ server/ - Backend API code
+✅ shared/ - Shared schemas
+✅ dist/ - Built production files (what actually runs)
+✅ Configuration files (vite.config.ts, tailwind.config.ts, etc.)
+
+📂 FOR CPANEL DEPLOYMENT:
 Upload contents to: /home/[username]/public_html/
 OR specific domain folder: /home/[username]/public_html/[yourdomain.com]/
 
 📂 Required cPanel Setup:
-- Node.js App enabled
+- Node.js App enabled (v18+)
 - MongoDB Atlas connection (already configured)
-- Minimum Node.js version: 18+
+- File extraction capabilities
 
 🚀 DEPLOYMENT STEPS:
 
