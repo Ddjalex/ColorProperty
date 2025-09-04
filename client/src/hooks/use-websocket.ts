@@ -6,8 +6,12 @@ export function useWebSocket() {
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
+    // Get the current host and port from the browser location
+    const host = window.location.host || 'localhost:5000'
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-    const wsUrl = `${protocol}//${window.location.host}/ws`
+    const wsUrl = `${protocol}//${host}/ws`
+    
+    console.log('Attempting WebSocket connection to:', wsUrl)
     
     const connectWebSocket = () => {
       try {
