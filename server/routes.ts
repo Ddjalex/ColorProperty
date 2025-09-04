@@ -74,8 +74,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Properties routes
   app.get('/api/properties', async (req, res) => {
     try {
-      const properties = await storage.getProperties(req.query);
-      res.json(properties);
+      const result = await storage.getProperties(req.query);
+      res.json(result);
     } catch (error) {
       res.status(500).json({ message: 'Failed to fetch properties' });
     }

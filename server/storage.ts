@@ -32,7 +32,7 @@ export interface IStorage {
   deleteUser(id: string): Promise<boolean>;
 
   // Property methods
-  getProperties(filters?: any): Promise<Property[]>;
+  getProperties(filters?: any): Promise<{ properties: Property[], total: number }>;
   getProperty(id: string): Promise<Property | undefined>;
   getPropertyBySlug(slug: string): Promise<Property | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
@@ -153,7 +153,7 @@ export class MongoStorage implements IStorage {
   }
 
   // Property methods
-  async getProperties(filters: any = {}): Promise<Property[]> {
+  async getProperties(filters: any = {}): Promise<{ properties: Property[], total: number }> {
     try {
       const collection = await getCollection('properties');
       const query: any = {};
@@ -181,11 +181,26 @@ export class MongoStorage implements IStorage {
         }
       }
 
-      const properties = await collection.find(query).sort({ createdAt: -1 }).toArray();
-      return properties;
+      // Get pagination parameters
+      const page = parseInt(filters.page) || 1;
+      const limit = parseInt(filters.limit) || 12;
+      const skip = (page - 1) * limit;
+
+      // Get total count for pagination
+      const total = await collection.countDocuments(query);
+      
+      // Get paginated results
+      const properties = await collection
+        .find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+      
+      return { properties, total };
     } catch (error) {
       console.error('Error getting properties:', error);
-      return [];
+      return { properties: [], total: 0 };
     }
   }
 

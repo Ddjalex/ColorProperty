@@ -25,9 +25,11 @@ export default function Home() {
     queryKey: ['/api/properties/featured'],
   })
   
-  const { data: allProperties = [], isLoading: isLoadingAll } = useQuery<Property[]>({
-    queryKey: ['/api/properties'],
+  const { data: propertiesData, isLoading: isLoadingAll } = useQuery<{ properties: Property[], total: number }>({
+    queryKey: ['/api/properties', { limit: 6 }],
   })
+  
+  const allProperties = propertiesData?.properties || []
   
   const handleSearch = () => {
     const params = new URLSearchParams()

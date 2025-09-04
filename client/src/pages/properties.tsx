@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 import PropertyCard from '@/components/property/property-card'
+import PropertyPagination from '@/components/property/pagination'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -19,53 +20,68 @@ export default function Properties() {
   const [maxPrice, setMaxPrice] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
   const [sortBy, setSortBy] = useState('latest')
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 12
 
-  const { data: allProperties = [], isLoading } = useQuery<Property[]>({
-    queryKey: ['/api/properties'],
+  // Build query parameters
+  const queryParams = useMemo(() => {
+    const params: any = {
+      page: currentPage,
+      limit: itemsPerPage,
+    }
+    
+    if (searchTerm) params.search = searchTerm
+    if (locationFilter) params.location = locationFilter
+    if (typeFilter && typeFilter !== 'all') params.propertyType = typeFilter
+    if (bedroomsFilter && bedroomsFilter !== 'any') params.bedrooms = bedroomsFilter
+    if (statusFilter && statusFilter !== 'all') params.status = statusFilter
+    if (minPrice) params.minPrice = minPrice
+    if (maxPrice) params.maxPrice = maxPrice
+    
+    return params
+  }, [currentPage, searchTerm, locationFilter, typeFilter, bedroomsFilter, statusFilter, minPrice, maxPrice])
+
+  const { data, isLoading } = useQuery<{ properties: Property[], total: number }>({
+    queryKey: ['/api/properties', queryParams],
   })
 
-  // Real-time filtering
-  const filteredProperties = useMemo(() => {
-    return allProperties.filter(property => {
-      const matchesSearch = !searchTerm || 
-        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        property.description.toLowerCase().includes(searchTerm.toLowerCase())
-      
-      const matchesLocation = !locationFilter || 
-        property.location.toLowerCase().includes(locationFilter.toLowerCase())
-      
-      const matchesType = !typeFilter || typeFilter === 'all' || 
-        property.propertyType === typeFilter
-      
-      const matchesBedrooms = !bedroomsFilter || bedroomsFilter === 'any' || 
-        (property.bedrooms && property.bedrooms >= parseInt(bedroomsFilter))
-      
-      const matchesStatus = !statusFilter || statusFilter === 'all' || 
-        property.status === statusFilter
-      
-      const matchesMinPrice = !minPrice || property.priceETB >= parseFloat(minPrice)
-      const matchesMaxPrice = !maxPrice || property.priceETB <= parseFloat(maxPrice)
-      
-      return matchesSearch && matchesLocation && matchesType && matchesBedrooms && 
-             matchesStatus && matchesMinPrice && matchesMaxPrice
-    })
-  }, [allProperties, searchTerm, locationFilter, typeFilter, bedroomsFilter, statusFilter, minPrice, maxPrice])
+  const properties = data?.properties || []
+  const totalProperties = data?.total || 0
+  const totalPages = Math.ceil(totalProperties / itemsPerPage)
 
-  // Sorting
-  const sortedProperties = useMemo(() => {
-    const sorted = [...filteredProperties]
-    switch (sortBy) {
-      case 'price-low':
-        return sorted.sort((a, b) => a.priceETB - b.priceETB)
-      case 'price-high':
-        return sorted.sort((a, b) => b.priceETB - a.priceETB)
-      case 'size-large':
-        return sorted.sort((a, b) => b.sizeSqm - a.sizeSqm)
-      default: // latest
-        return sorted.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+  // Reset to page 1 when filters change
+  const handleFilterChange = (filterType: string, value: string) => {
+    setCurrentPage(1)
+    switch (filterType) {
+      case 'search':
+        setSearchTerm(value)
+        break
+      case 'location':
+        setLocationFilter(value)
+        break
+      case 'type':
+        setTypeFilter(value)
+        break
+      case 'bedrooms':
+        setBedroomsFilter(value)
+        break
+      case 'status':
+        setStatusFilter(value)
+        break
+      case 'minPrice':
+        setMinPrice(value)
+        break
+      case 'maxPrice':
+        setMaxPrice(value)
+        break
     }
-  }, [filteredProperties, sortBy])
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const handleFiltersChange = () => {
     // This function is kept for compatibility but filters are now applied automatically
@@ -91,7 +107,7 @@ export default function Properties() {
               <Input
                 placeholder="Search properties..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
                 data-testid="input-search"
                 className="focus:ring-2 focus:ring-primary"
               />
@@ -102,14 +118,14 @@ export default function Properties() {
               <Input
                 placeholder="Enter location..."
                 value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
+                onChange={(e) => handleFilterChange('location', e.target.value)}
                 data-testid="filter-location"
               />
             </div>
             
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Type</label>
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <Select value={typeFilter} onValueChange={(value) => handleFilterChange('type', value)}>
                 <SelectTrigger data-testid="filter-property-type">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
@@ -126,7 +142,7 @@ export default function Properties() {
             
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-2">Bedrooms</label>
-              <Select value={bedroomsFilter} onValueChange={setBedroomsFilter}>
+              <Select value={bedroomsFilter} onValueChange={(value) => handleFilterChange('bedrooms', value)}>
                 <SelectTrigger data-testid="filter-bedrooms">
                   <SelectValue placeholder="Any" />
                 </SelectTrigger>
@@ -146,7 +162,7 @@ export default function Properties() {
                 type="number"
                 placeholder="Min price"
                 value={minPrice}
-                onChange={(e) => setMinPrice(e.target.value)}
+                onChange={(e) => handleFilterChange('minPrice', e.target.value)}
                 data-testid="filter-min-price"
               />
             </div>
@@ -157,7 +173,7 @@ export default function Properties() {
                 type="number"
                 placeholder="Max price"
                 value={maxPrice}
-                onChange={(e) => setMaxPrice(e.target.value)}
+                onChange={(e) => handleFilterChange('maxPrice', e.target.value)}
                 data-testid="filter-max-price"
               />
             </div>
@@ -167,7 +183,7 @@ export default function Properties() {
         {/* View Controls */}
         <div className="flex items-center justify-between mb-8">
           <p className="text-muted-foreground" data-testid="properties-count">
-            {isLoading ? 'Loading...' : `Showing ${sortedProperties.length} properties`}
+            {isLoading ? 'Loading...' : `Showing ${properties.length} of ${totalProperties} properties`}
           </p>
           <div className="flex items-center space-x-4">
             <div className="flex bg-muted rounded-lg p-1">
@@ -211,9 +227,9 @@ export default function Properties() {
               <div key={i} className="bg-card rounded-xl shadow-lg h-96 animate-pulse" />
             ))}
           </div>
-        ) : sortedProperties.length > 0 ? (
+        ) : properties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {sortedProperties.map((property: Property) => (
+            {properties.map((property: Property) => (
               <PropertyCard key={property._id} property={property} />
             ))}
           </div>
@@ -225,22 +241,13 @@ export default function Properties() {
         )}
 
         {/* Pagination */}
-        {sortedProperties.length > 0 && (
-          <div className="flex justify-center mt-12">
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" data-testid="button-prev-page">
-                Previous
-              </Button>
-              <Button variant="default" size="sm" data-testid="button-page-1">1</Button>
-              <Button variant="outline" size="sm" data-testid="button-page-2">2</Button>
-              <Button variant="outline" size="sm" data-testid="button-page-3">3</Button>
-              <span className="text-muted-foreground">...</span>
-              <Button variant="outline" size="sm" data-testid="button-page-last">13</Button>
-              <Button variant="outline" size="sm" data-testid="button-next-page">
-                Next
-              </Button>
-            </div>
-          </div>
+        {totalPages > 1 && (
+          <PropertyPagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            className="mt-12"
+          />
         )}
       </div>
 
