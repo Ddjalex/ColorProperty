@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const { user, isAuthenticated } = useAuth()
 
   const { data: propertiesData } = useQuery<{ properties: Property[], total: number }>({
-    queryKey: ['/api/properties', { includeAllStatuses: true }],
+    queryKey: ['/api/properties', { includeAllStatuses: 'true' }],
     enabled: isAuthenticated,
   })
   

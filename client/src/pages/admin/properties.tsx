@@ -29,7 +29,7 @@ export default function AdminProperties() {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
 
   const { data: propertiesData, isLoading } = useQuery<{ properties: Property[], total: number }>({
-    queryKey: ['/api/properties', { includeAllStatuses: true }],
+    queryKey: ['/api/properties', { includeAllStatuses: 'true' }],
     enabled: isAuthenticated,
   })
   
