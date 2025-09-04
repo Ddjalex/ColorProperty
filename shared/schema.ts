@@ -31,6 +31,7 @@ export const propertySchema = z.object({
   featured: z.boolean().default(false),
   amenities: z.array(z.string()).default([]),
   images: z.array(z.string()).default([]),
+  imageCount: z.number().optional(), // Count of images for listing view
   project: z.string().optional(),
   coordinates: z.object({
     lat: z.number(),

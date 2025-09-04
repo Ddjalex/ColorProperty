@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Heart, Phone, MessageCircle, Bed, Bath, Square, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { formatCurrency, getImageUrl } from '@/lib/utils'
+import { formatCurrency, getPropertyImageUrl } from '@/lib/utils'
 import type { Property, Settings } from '@shared/schema'
 
 interface PropertyCardProps {
@@ -61,7 +61,7 @@ export default function PropertyCard({ property }: PropertyCardProps) {
     <div className="bg-card rounded-lg shadow-md overflow-hidden border border-border hover:shadow-lg transition-shadow" data-testid={`property-card-${property._id}`}>
       <div className="relative">
         <img 
-          src={getImageUrl(property.images?.[0], Math.abs(property._id?.charCodeAt(0) || 0))} 
+          src={getPropertyImageUrl(property._id!, 0)} 
           alt={property.title}
           className="w-full h-48 object-cover"
           loading="lazy"

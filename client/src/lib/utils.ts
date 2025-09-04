@@ -60,3 +60,9 @@ export function getImageUrl(url: string, index: number = 0): string {
   
   return url
 }
+
+// New function to get real property images from the database
+export function getPropertyImageUrl(propertyId: string, imageIndex: number = 0): string {
+  if (!propertyId) return placeholderImages[imageIndex % placeholderImages.length]
+  return `/api/properties/${propertyId}/images/${imageIndex}`
+}

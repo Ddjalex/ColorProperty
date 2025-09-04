@@ -198,7 +198,7 @@ export class MongoStorage implements IStorage {
       const total = await collection.countDocuments(query, { hint: { createdAt: -1 } });
       
       // Optimize query with projection to reduce data transfer
-      // Only return first image for listing view to improve performance
+      // Exclude image data from listing to improve performance - images served via separate endpoint
       const properties = await collection
         .find(query, {
           projection: {
@@ -213,7 +213,7 @@ export class MongoStorage implements IStorage {
             priceETB: 1,
             status: 1,
             featured: 1,
-            images: { $slice: 1 }, // Only get first image for listing
+            imageCount: { $size: { $ifNull: ["$images", []] } }, // Count of images instead of image data
             amenities: { $slice: 3 }, // Only get first 3 amenities for listing
             coordinates: 1,
             createdAt: 1
@@ -330,7 +330,7 @@ export class MongoStorage implements IStorage {
             priceETB: 1,
             status: 1,
             featured: 1,
-            images: { $slice: 1 }, // Only get first image
+            imageCount: { $size: { $ifNull: ["$images", []] } }, // Count of images instead of image data
             amenities: { $slice: 3 }, // Only get first 3 amenities
             coordinates: 1,
             createdAt: 1

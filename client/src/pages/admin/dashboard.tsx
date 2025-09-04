@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Building, Users, FileText, MessageSquare, Plus, Eye, Edit, Trash2 } from 'lucide-react'
 import { Link } from 'wouter'
-import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
+import { formatCurrency, formatDate, getPropertyImageUrl } from '@/lib/utils'
 import type { Property, Lead, TeamMember, BlogPost } from '@shared/schema'
 
 export default function AdminDashboard() {
@@ -166,9 +166,9 @@ export default function AdminDashboard() {
                         <td className="py-4">
                           <div className="flex items-center space-x-3">
                             <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
-                              {property.images[0] && (
+                              {property.imageCount > 0 && (
                                 <img 
-                                  src={getImageUrl(property.images[0], Math.abs(property._id?.charCodeAt(0) || 0))} 
+                                  src={getPropertyImageUrl(property._id!, 0)} 
                                   alt={property.title}
                                   className="w-full h-full object-cover"
                                 />

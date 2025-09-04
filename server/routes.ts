@@ -385,6 +385,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Image serving endpoint for property images
+  app.get('/api/properties/:id/images/:index', async (req, res) => {
+    try {
+      const property = await storage.getProperty(req.params.id);
+      if (!property || !property.images) {
+        return res.status(404).json({ message: 'Property or image not found' });
+      }
+
+      const imageIndex = parseInt(req.params.index);
+      if (imageIndex < 0 || imageIndex >= property.images.length) {
+        return res.status(404).json({ message: 'Image index out of range' });
+      }
+
+      const imageData = property.images[imageIndex];
+      
+      // Handle base64 images
+      if (imageData.startsWith('data:image/')) {
+        const base64Data = imageData.split(',')[1];
+        const mimeType = imageData.split(';')[0].split(':')[1];
+        
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        res.setHeader('Content-Type', mimeType);
+        res.setHeader('Content-Length', buffer.length);
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+        res.send(buffer);
+      } else if (imageData.startsWith('http')) {
+        // Redirect to external image
+        res.redirect(imageData);
+      } else {
+        res.status(404).json({ message: 'Invalid image format' });
+      }
+    } catch (error) {
+      console.error('Error serving image:', error);
+      res.status(500).json({ message: 'Failed to serve image' });
+    }
+  });
+
   // Initialize admin user if it doesn't exist
   app.post('/api/init-admin', async (req, res) => {
     try {
