@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useLocation } from 'wouter'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 import HeroSlider from '@/components/property/hero-slider'
@@ -11,6 +13,11 @@ import { useWebSocket } from '@/hooks/use-websocket'
 import type { Property } from '@shared/schema'
 
 export default function Home() {
+  const [, setLocation] = useLocation()
+  const [searchLocation, setSearchLocation] = useState('')
+  const [searchType, setSearchType] = useState('')
+  const [searchBedrooms, setSearchBedrooms] = useState('')
+  
   // Connect to WebSocket for real-time updates
   useWebSocket()
   
@@ -21,6 +28,16 @@ export default function Home() {
   const { data: allProperties = [], isLoading: isLoadingAll } = useQuery<Property[]>({
     queryKey: ['/api/properties'],
   })
+  
+  const handleSearch = () => {
+    const params = new URLSearchParams()
+    if (searchLocation) params.append('location', searchLocation)
+    if (searchType && searchType !== 'all') params.append('type', searchType)
+    if (searchBedrooms && searchBedrooms !== 'any') params.append('bedrooms', searchBedrooms)
+    
+    const queryString = params.toString()
+    setLocation(`/properties${queryString ? `?${queryString}` : ''}`)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -38,13 +55,15 @@ export default function Home() {
                 <label className="block text-sm font-medium text-muted-foreground mb-2">Location</label>
                 <Input 
                   placeholder="Enter location..." 
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
                   className="focus:ring-2 focus:ring-primary focus:border-transparent"
                   data-testid="input-location"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">Property Type</label>
-                <Select>
+                <Select value={searchType} onValueChange={setSearchType}>
                   <SelectTrigger data-testid="select-property-type">
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
@@ -59,7 +78,7 @@ export default function Home() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-muted-foreground mb-2">Bedrooms</label>
-                <Select>
+                <Select value={searchBedrooms} onValueChange={setSearchBedrooms}>
                   <SelectTrigger data-testid="select-bedrooms">
                     <SelectValue placeholder="Any" />
                   </SelectTrigger>
@@ -73,7 +92,11 @@ export default function Home() {
                 </Select>
               </div>
               <div className="flex items-end">
-                <Button className="w-full" data-testid="button-search-properties">
+                <Button 
+                  className="w-full" 
+                  onClick={handleSearch}
+                  data-testid="button-search-properties"
+                >
                   🔍 Search Properties
                 </Button>
               </div>
@@ -111,7 +134,11 @@ export default function Home() {
           )}
 
           <div className="text-center mt-12">
-            <Button size="lg" data-testid="button-view-all-properties">
+            <Button 
+              size="lg" 
+              onClick={() => setLocation('/properties')}
+              data-testid="button-view-all-properties"
+            >
               View All Properties
             </Button>
           </div>

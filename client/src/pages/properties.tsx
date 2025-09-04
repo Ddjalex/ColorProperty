@@ -1,25 +1,74 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 import PropertyCard from '@/components/property/property-card'
-import PropertyFilters from '@/components/property/property-filters'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Grid, Map } from 'lucide-react'
 import type { Property } from '@shared/schema'
 
 export default function Properties() {
-  const [filters, setFilters] = useState({})
+  const [searchTerm, setSearchTerm] = useState('')
+  const [locationFilter, setLocationFilter] = useState('')
+  const [typeFilter, setTypeFilter] = useState('')
+  const [bedroomsFilter, setBedroomsFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [minPrice, setMinPrice] = useState('')
+  const [maxPrice, setMaxPrice] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid')
   const [sortBy, setSortBy] = useState('latest')
 
-  const { data: properties = [], isLoading } = useQuery<Property[]>({
-    queryKey: ['/api/properties', filters],
+  const { data: allProperties = [], isLoading } = useQuery<Property[]>({
+    queryKey: ['/api/properties'],
   })
 
-  const handleFiltersChange = (newFilters: any) => {
-    setFilters(newFilters)
+  // Real-time filtering
+  const filteredProperties = useMemo(() => {
+    return allProperties.filter(property => {
+      const matchesSearch = !searchTerm || 
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.description.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      const matchesLocation = !locationFilter || 
+        property.location.toLowerCase().includes(locationFilter.toLowerCase())
+      
+      const matchesType = !typeFilter || typeFilter === 'all' || 
+        property.propertyType === typeFilter
+      
+      const matchesBedrooms = !bedroomsFilter || bedroomsFilter === 'any' || 
+        (property.bedrooms && property.bedrooms >= parseInt(bedroomsFilter))
+      
+      const matchesStatus = !statusFilter || statusFilter === 'all' || 
+        property.status === statusFilter
+      
+      const matchesMinPrice = !minPrice || property.priceETB >= parseFloat(minPrice)
+      const matchesMaxPrice = !maxPrice || property.priceETB <= parseFloat(maxPrice)
+      
+      return matchesSearch && matchesLocation && matchesType && matchesBedrooms && 
+             matchesStatus && matchesMinPrice && matchesMaxPrice
+    })
+  }, [allProperties, searchTerm, locationFilter, typeFilter, bedroomsFilter, statusFilter, minPrice, maxPrice])
+
+  // Sorting
+  const sortedProperties = useMemo(() => {
+    const sorted = [...filteredProperties]
+    switch (sortBy) {
+      case 'price-low':
+        return sorted.sort((a, b) => a.priceETB - b.priceETB)
+      case 'price-high':
+        return sorted.sort((a, b) => b.priceETB - a.priceETB)
+      case 'size-large':
+        return sorted.sort((a, b) => b.sizeSqm - a.sizeSqm)
+      default: // latest
+        return sorted.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+    }
+  }, [filteredProperties, sortBy])
+
+  const handleFiltersChange = () => {
+    // This function is kept for compatibility but filters are now applied automatically
   }
 
   return (
@@ -34,13 +83,91 @@ export default function Properties() {
           </p>
         </div>
 
-        {/* Filters */}
-        <PropertyFilters onFiltersChange={handleFiltersChange} />
+        {/* Real-time Search and Filters */}
+        <div className="bg-card rounded-xl shadow-lg p-6 border border-border mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Search</label>
+              <Input
+                placeholder="Search properties..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                data-testid="input-search"
+                className="focus:ring-2 focus:ring-primary"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Location</label>
+              <Input
+                placeholder="Enter location..."
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                data-testid="filter-location"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Type</label>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger data-testid="filter-property-type">
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="house">House</SelectItem>
+                  <SelectItem value="commercial">Commercial</SelectItem>
+                  <SelectItem value="shop">Shop</SelectItem>
+                  <SelectItem value="land">Land</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Bedrooms</label>
+              <Select value={bedroomsFilter} onValueChange={setBedroomsFilter}>
+                <SelectTrigger data-testid="filter-bedrooms">
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any</SelectItem>
+                  <SelectItem value="1">1+</SelectItem>
+                  <SelectItem value="2">2+</SelectItem>
+                  <SelectItem value="3">3+</SelectItem>
+                  <SelectItem value="4">4+</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Min Price</label>
+              <Input
+                type="number"
+                placeholder="Min price"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                data-testid="filter-min-price"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-2">Max Price</label>
+              <Input
+                type="number"
+                placeholder="Max price"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                data-testid="filter-max-price"
+              />
+            </div>
+          </div>
+        </div>
 
         {/* View Controls */}
         <div className="flex items-center justify-between mb-8">
           <p className="text-muted-foreground" data-testid="properties-count">
-            {isLoading ? 'Loading...' : `Showing ${properties.length} properties`}
+            {isLoading ? 'Loading...' : `Showing ${sortedProperties.length} properties`}
           </p>
           <div className="flex items-center space-x-4">
             <div className="flex bg-muted rounded-lg p-1">
@@ -84,9 +211,9 @@ export default function Properties() {
               <div key={i} className="bg-card rounded-xl shadow-lg h-96 animate-pulse" />
             ))}
           </div>
-        ) : properties.length > 0 ? (
+        ) : sortedProperties.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {properties.map((property) => (
+            {sortedProperties.map((property: Property) => (
               <PropertyCard key={property._id} property={property} />
             ))}
           </div>
@@ -98,7 +225,7 @@ export default function Properties() {
         )}
 
         {/* Pagination */}
-        {properties.length > 0 && (
+        {sortedProperties.length > 0 && (
           <div className="flex justify-center mt-12">
             <div className="flex items-center space-x-2">
               <Button variant="outline" size="sm" data-testid="button-prev-page">
