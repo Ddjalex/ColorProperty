@@ -29,9 +29,23 @@ export function useWebSocket() {
             switch (message.type) {
               case 'property_created':
               case 'property_updated':
-                // Invalidate and refetch properties data
+                // Invalidate all property-related queries for instant updates
                 queryClient.invalidateQueries({ queryKey: ['/api/properties'] })
                 queryClient.invalidateQueries({ queryKey: ['/api/properties/featured'] })
+                queryClient.invalidateQueries({ queryKey: ['/api/properties/slug'] })
+                
+                // Also refetch immediately for faster updates
+                queryClient.refetchQueries({ queryKey: ['/api/properties'] })
+                queryClient.refetchQueries({ queryKey: ['/api/properties/featured'] })
+                
+                console.log(`Real-time update: ${message.type}`)
+                break
+              case 'property_deleted':
+                // Handle property deletions
+                queryClient.invalidateQueries({ queryKey: ['/api/properties'] })
+                queryClient.invalidateQueries({ queryKey: ['/api/properties/featured'] })
+                queryClient.refetchQueries({ queryKey: ['/api/properties'] })
+                console.log('Real-time update: property_deleted')
                 break
               default:
                 console.log('Unknown message type:', message.type)
