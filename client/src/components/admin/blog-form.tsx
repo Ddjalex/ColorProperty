@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -45,6 +45,8 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
   const { toast } = useToast()
   const { user } = useAuth()
   const [newTag, setNewTag] = useState('')
+  const [imagePreview, setImagePreview] = useState<string>('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
   
   const createBlogPost = useCreateBlogPost()
   const updateBlogPost = useUpdateBlogPost()
@@ -84,6 +86,7 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
         publishedAt: post.publishedAt ? new Date(post.publishedAt) : undefined,
         authorId: post.authorId,
       })
+      setImagePreview(post.coverImage || '')
     }
   }, [post, form])
 
@@ -158,6 +161,45 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
   const removeTag = (tag: string) => {
     const currentTags = form.getValues('tags')
     form.setValue('tags', currentTags.filter(t => t !== tag))
+  }
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string
+        setImagePreview(dataUrl)
+        form.setValue('coverImage', dataUrl)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeImage = () => {
+    setImagePreview('')
+    form.setValue('coverImage', '')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -257,43 +299,67 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
               name="coverImage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cover Image URL</FormLabel>
+                  <FormLabel>Cover Image</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="url" 
-                      placeholder="https://example.com/cover-image.jpg" 
-                      {...field} 
-                      data-testid="input-blog-cover-image"
-                    />
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-4">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          data-testid="input-blog-cover-image-upload"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex items-center gap-2"
+                          data-testid="button-upload-cover-image"
+                        >
+                          <Upload className="h-4 w-4" />
+                          {imagePreview ? 'Change Image' : 'Upload Image'}
+                        </Button>
+                        {imagePreview && (
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={removeImage}
+                            data-testid="button-remove-cover-image"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {imagePreview && (
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center gap-4">
+                            <img 
+                              src={imagePreview} 
+                              alt="Cover Preview"
+                              className="w-24 h-16 object-cover rounded-lg"
+                            />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">Cover Image Preview</p>
+                              <p className="text-xs text-muted-foreground">
+                                This image will appear in blog listings and social media shares
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </FormControl>
                   <FormDescription>
-                    Optional cover image for the blog post
+                    Upload a cover image for the blog post (max 5MB, JPG/PNG/WebP)
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            {form.watch('coverImage') && (
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center gap-4">
-                  <img 
-                    src={form.watch('coverImage')} 
-                    alt="Cover Preview"
-                    className="w-24 h-16 object-cover rounded-lg"
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder-blog.jpg'
-                    }}
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Cover Image Preview</p>
-                    <p className="text-xs text-muted-foreground">
-                      This image will appear in blog listings and social media shares
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
