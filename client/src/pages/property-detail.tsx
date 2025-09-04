@@ -3,12 +3,13 @@ import { useQuery } from '@tanstack/react-query'
 import { useWebSocket } from '@/hooks/use-websocket'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
+import PropertyImageSlider from '@/components/property/property-image-slider'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Phone, MessageCircle, Bed, Bath, Square, MapPin, Calendar, Heart, Share2 } from 'lucide-react'
-import { formatCurrency, generateWhatsAppUrl, getImageUrl, formatDate } from '@/lib/utils'
+import { formatCurrency, generateWhatsAppUrl, formatDate } from '@/lib/utils'
 import type { Property, Settings } from '@shared/schema'
 
 export default function PropertyDetail() {
@@ -106,14 +107,10 @@ export default function PropertyDetail() {
       <div className="container mx-auto px-4 py-4">
         {/* Image Gallery */}
         <div className="relative mb-4">
-          <div className="h-48 md:h-60 bg-cover bg-center rounded-lg overflow-hidden">
-            <img 
-              src={getImageUrl(property.images[0])} 
-              alt={property.title}
-              className="w-full h-full object-cover"
-              data-testid="property-main-image"
-            />
-          </div>
+          <PropertyImageSlider 
+            property={property} 
+            className="h-48 md:h-60"
+          />
           
           {/* Status Badge */}
           <div className="absolute top-4 left-4">
