@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Plus, Search, Eye, Edit, Trash2 } from 'lucide-react'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
 import { useDeleteProperty } from '@/hooks/use-properties'
 import { useToast } from '@/hooks/use-toast'
 import type { Property } from '@shared/schema'
@@ -28,10 +28,12 @@ export default function AdminProperties() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editingProperty, setEditingProperty] = useState<Property | null>(null)
 
-  const { data: properties = [], isLoading } = useQuery<Property[]>({
-    queryKey: ['/api/properties'],
+  const { data: propertiesData, isLoading } = useQuery<{ properties: Property[], total: number }>({
+    queryKey: ['/api/properties', { includeAllStatuses: true }],
     enabled: isAuthenticated,
   })
+  
+  const properties = propertiesData?.properties || []
 
   const deleteProperty = useDeleteProperty()
 
@@ -203,7 +205,7 @@ export default function AdminProperties() {
                             <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
                               {property.images[0] && (
                                 <img 
-                                  src={property.images[0]} 
+                                  src={getImageUrl(property.images[0], Math.abs(property._id?.charCodeAt(0) || 0))} 
                                   alt={property.title}
                                   className="w-full h-full object-cover"
                                 />

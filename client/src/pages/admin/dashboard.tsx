@@ -6,16 +6,18 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Building, Users, FileText, MessageSquare, Plus, Eye, Edit, Trash2 } from 'lucide-react'
 import { Link } from 'wouter'
-import { formatCurrency, formatDate } from '@/lib/utils'
+import { formatCurrency, formatDate, getImageUrl } from '@/lib/utils'
 import type { Property, Lead, TeamMember, BlogPost } from '@shared/schema'
 
 export default function AdminDashboard() {
   const { user, isAuthenticated } = useAuth()
 
-  const { data: properties = [] } = useQuery<Property[]>({
-    queryKey: ['/api/properties'],
+  const { data: propertiesData } = useQuery<{ properties: Property[], total: number }>({
+    queryKey: ['/api/properties', { includeAllStatuses: true }],
     enabled: isAuthenticated,
   })
+  
+  const properties = propertiesData?.properties || []
 
   const { data: leads = [] } = useQuery<Lead[]>({
     queryKey: ['/api/leads'],
@@ -166,7 +168,7 @@ export default function AdminDashboard() {
                             <div className="w-12 h-12 bg-muted rounded-lg overflow-hidden">
                               {property.images[0] && (
                                 <img 
-                                  src={property.images[0]} 
+                                  src={getImageUrl(property.images[0], Math.abs(property._id?.charCodeAt(0) || 0))} 
                                   alt={property.title}
                                   className="w-full h-full object-cover"
                                 />
