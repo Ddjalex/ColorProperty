@@ -64,6 +64,13 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
     },
   })
 
+  // Update authorId when user is loaded
+  useEffect(() => {
+    if (user?._id && !post) {
+      form.setValue('authorId', user._id)
+    }
+  }, [user, form, post])
+
   useEffect(() => {
     if (post) {
       form.reset({
@@ -97,12 +104,24 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
 
   const onSubmit = async (data: BlogPostFormData) => {
     try {
+      // Ensure authorId is set
+      if (!data.authorId && user?._id) {
+        data.authorId = user._id
+      }
+
+      // Validate authorId is present
+      if (!data.authorId) {
+        throw new Error('Author ID is required but missing')
+      }
+
       // Clean up empty fields
       const submitData = {
         ...data,
         coverImage: data.coverImage?.trim() || undefined,
         publishedAt: data.status === 'published' ? (data.publishedAt || new Date()) : undefined,
       }
+
+      console.log('Submitting blog post data:', { ...submitData, body: '[content]' })
 
       if (post) {
         await updateBlogPost.mutateAsync({ id: post._id!, ...submitData })
@@ -113,15 +132,16 @@ export default function BlogForm({ post, onSuccess }: BlogFormProps) {
       } else {
         await createBlogPost.mutateAsync(submitData)
         toast({
-          title: "Blog Post Created",
+          title: "Blog Post Created", 
           description: "The blog post has been successfully created.",
         })
       }
       onSuccess?.()
     } catch (error) {
+      console.error('Failed to save blog post:', error)
       toast({
         title: "Error",
-        description: "Failed to save blog post. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save blog post. Please try again.",
         variant: "destructive",
       })
     }
