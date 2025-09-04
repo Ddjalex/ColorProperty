@@ -3,14 +3,14 @@ import { apiRequest } from '@/lib/queryClient'
 import type { Property, InsertProperty } from '@shared/schema'
 
 export function useProperties(filters?: any) {
-  return useQuery<Property[]>({
+  return useQuery<{ properties: Property[], total: number }>({
     queryKey: ['/api/properties', filters],
   })
 }
 
 export function useProperty(id: string) {
   return useQuery<Property>({
-    queryKey: ['/api/properties', id],
+    queryKey: [`/api/properties/${id}`],
   })
 }
 

@@ -91,6 +91,9 @@ export class MongoStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     try {
       const collection = await getCollection('users');
+      if (!ObjectId.isValid(id)) {
+        return undefined;
+      }
       const user = await collection.findOne({ _id: new ObjectId(id) });
       return user || undefined;
     } catch (error) {
@@ -207,6 +210,10 @@ export class MongoStorage implements IStorage {
   async getProperty(id: string): Promise<Property | undefined> {
     try {
       const collection = await getCollection('properties');
+      // Validate ObjectId format before creating ObjectId
+      if (!ObjectId.isValid(id)) {
+        return undefined;
+      }
       const property = await collection.findOne({ _id: new ObjectId(id) });
       return property || undefined;
     } catch (error) {
@@ -307,6 +314,9 @@ export class MongoStorage implements IStorage {
   async getProject(id: string): Promise<Project | undefined> {
     try {
       const collection = await getCollection('projects');
+      if (!ObjectId.isValid(id)) {
+        return undefined;
+      }
       const project = await collection.findOne({ _id: new ObjectId(id) });
       return project || undefined;
     } catch (error) {
@@ -416,6 +426,9 @@ export class MongoStorage implements IStorage {
   async getBlogPost(id: string): Promise<BlogPost | undefined> {
     try {
       const collection = await getCollection('blog_posts');
+      if (!ObjectId.isValid(id)) {
+        return undefined;
+      }
       const post = await collection.findOne({ _id: new ObjectId(id) });
       return post || undefined;
     } catch (error) {
@@ -488,6 +501,9 @@ export class MongoStorage implements IStorage {
   async getTeamMember(id: string): Promise<TeamMember | undefined> {
     try {
       const collection = await getCollection('team_members');
+      if (!ObjectId.isValid(id)) {
+        return undefined;
+      }
       const member = await collection.findOne({ _id: new ObjectId(id) });
       return member || undefined;
     } catch (error) {
@@ -618,6 +634,9 @@ export class MongoStorage implements IStorage {
   async getHeroSlide(id: string): Promise<HeroSlide | undefined> {
     try {
       const collection = await getCollection('hero_slides');
+      if (!ObjectId.isValid(id)) {
+        return undefined;
+      }
       const slide = await collection.findOne({ _id: new ObjectId(id) });
       return slide || undefined;
     } catch (error) {
