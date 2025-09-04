@@ -41,6 +41,8 @@ async function createIndexes() {
     await propertiesCollection.createIndex({ location: 1 });
     await propertiesCollection.createIndex({ priceETB: 1 });
     await propertiesCollection.createIndex({ featured: 1 });
+    await propertiesCollection.createIndex({ featured: 1, status: 1 }); // Compound index for featured properties
+    await propertiesCollection.createIndex({ status: 1, createdAt: -1 }); // Compound index for status filtering with sorting
 
     // Blog posts indexes
     const blogCollection = db.collection('blog_posts');
