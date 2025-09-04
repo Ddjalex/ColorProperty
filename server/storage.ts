@@ -751,19 +751,28 @@ export class MongoStorage implements IStorage {
       console.log('Found existing hero slide, proceeding with update');
       
       const updateData = { ...slide, updatedAt: new Date() };
-      const result = await collection.findOneAndUpdate(
+      
+      // First perform the update
+      const updateResult = await collection.updateOne(
         { _id: objectId },
-        { $set: updateData },
-        { returnDocument: 'after' }
+        { $set: updateData }
       );
       
-      if (result.value) {
-        console.log('Hero slide updated successfully for ID:', id);
-      } else {
-        console.log('Update operation completed but no document returned for ID:', id);
+      if (updateResult.matchedCount === 0) {
+        console.log('No document matched for update, ID:', id);
+        return undefined;
       }
       
-      return result.value || undefined;
+      // Then fetch the updated document
+      const updatedSlide = await collection.findOne({ _id: objectId });
+      
+      if (updatedSlide) {
+        console.log('Hero slide updated successfully for ID:', id);
+        return updatedSlide;
+      } else {
+        console.log('Update operation completed but could not fetch updated document for ID:', id);
+        return undefined;
+      }
     } catch (error) {
       console.error('Error updating hero slide:', error);
       console.error('ID that caused error:', id);

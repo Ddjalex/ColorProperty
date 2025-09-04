@@ -113,11 +113,14 @@ export default function AdminHeroSlides() {
           </Button>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" aria-describedby="dialog-description">
               <DialogHeader>
                 <DialogTitle>
                   {editingSlide ? 'Edit Hero Slide' : 'Add New Hero Slide'}
                 </DialogTitle>
+                <p id="dialog-description" className="text-sm text-muted-foreground">
+                  {editingSlide ? 'Update the hero slide information and settings below.' : 'Fill in the details to create a new hero slide for the homepage.'}
+                </p>
               </DialogHeader>
               <HeroSlideForm 
                 slide={editingSlide}
