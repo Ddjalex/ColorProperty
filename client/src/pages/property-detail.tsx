@@ -104,12 +104,12 @@ export default function PropertyDetail() {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container mx-auto px-4 py-2">
+      <div className="container mx-auto px-4 py-6">
         {/* Image Gallery */}
-        <div className="relative mb-3">
+        <div className="relative mb-6">
           <PropertyImageSlider 
             property={property} 
-            className="h-48 md:h-56 lg:h-64"
+            className="h-64 md:h-80 lg:h-96"
           />
           
           {/* Status Badge */}
@@ -133,67 +133,67 @@ export default function PropertyDetail() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Title and Location */}
-            <div className="mb-3">
-              <h1 className="text-xl md:text-2xl font-bold text-foreground mb-1" data-testid="property-title">
+            <div className="mb-6">
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3" data-testid="property-title">
                 {property.title}
               </h1>
-              <div className="flex items-center text-muted-foreground mb-2" data-testid="property-location">
-                <MapPin className="h-4 w-4 mr-2" />
+              <div className="flex items-center text-muted-foreground mb-4" data-testid="property-location">
+                <MapPin className="h-5 w-5 mr-2" />
                 {property.location}
               </div>
-              <div className="text-xl md:text-2xl font-bold text-primary" data-testid="property-price">
+              <div className="text-2xl md:text-3xl font-bold text-primary" data-testid="property-price">
                 {formatCurrency(property.priceETB)}
               </div>
             </div>
 
             {/* Key Details */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="grid grid-cols-3 gap-4 mb-6">
               {property.bedrooms && (
-                <div className="text-center p-2 bg-muted rounded-lg" data-testid="property-bedrooms">
-                  <Bed className="h-4 w-4 mx-auto mb-1 text-primary" />
-                  <div className="font-semibold text-sm">{property.bedrooms}</div>
-                  <div className="text-xs text-muted-foreground">Bedrooms</div>
+                <div className="text-center p-4 bg-muted rounded-lg" data-testid="property-bedrooms">
+                  <Bed className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <div className="font-semibold text-lg">{property.bedrooms}</div>
+                  <div className="text-sm text-muted-foreground">Bedrooms</div>
                 </div>
               )}
               {property.bathrooms && (
-                <div className="text-center p-2 bg-muted rounded-lg" data-testid="property-bathrooms">
-                  <Bath className="h-4 w-4 mx-auto mb-1 text-primary" />
-                  <div className="font-semibold text-sm">{property.bathrooms}</div>
-                  <div className="text-xs text-muted-foreground">Bathrooms</div>
+                <div className="text-center p-4 bg-muted rounded-lg" data-testid="property-bathrooms">
+                  <Bath className="h-6 w-6 mx-auto mb-2 text-primary" />
+                  <div className="font-semibold text-lg">{property.bathrooms}</div>
+                  <div className="text-sm text-muted-foreground">Bathrooms</div>
                 </div>
               )}
-              <div className="text-center p-2 bg-muted rounded-lg" data-testid="property-size">
-                <Square className="h-4 w-4 mx-auto mb-1 text-primary" />
-                <div className="font-semibold text-sm">{property.sizeSqm}</div>
-                <div className="text-xs text-muted-foreground">Square Meters</div>
+              <div className="text-center p-4 bg-muted rounded-lg" data-testid="property-size">
+                <Square className="h-6 w-6 mx-auto mb-2 text-primary" />
+                <div className="font-semibold text-lg">{property.sizeSqm}</div>
+                <div className="text-sm text-muted-foreground">Square Meters</div>
               </div>
             </div>
 
             {/* Tabs */}
-            <Tabs defaultValue="description" className="mb-4">
-              <TabsList className="grid w-full grid-cols-3 h-9">
-                <TabsTrigger value="description" data-testid="tab-description" className="text-sm">Description</TabsTrigger>
-                <TabsTrigger value="amenities" data-testid="tab-amenities" className="text-sm">Amenities</TabsTrigger>
-                <TabsTrigger value="location" data-testid="tab-location" className="text-sm">Location</TabsTrigger>
+            <Tabs defaultValue="description" className="mb-6">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="description" data-testid="tab-description">Description</TabsTrigger>
+                <TabsTrigger value="amenities" data-testid="tab-amenities">Amenities</TabsTrigger>
+                <TabsTrigger value="location" data-testid="tab-location">Location</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="description" className="mt-3">
-                <div className="prose max-w-none text-sm" data-testid="property-description">
-                  <p>{property.description}</p>
+              <TabsContent value="description" className="mt-6">
+                <div className="prose max-w-none" data-testid="property-description">
+                  <p className="text-base leading-relaxed">{property.description}</p>
                 </div>
               </TabsContent>
               
-              <TabsContent value="amenities" className="mt-3">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm" data-testid="property-amenities">
+              <TabsContent value="amenities" className="mt-6">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4" data-testid="property-amenities">
                   {property.amenities.length > 0 ? (
                     property.amenities.map((amenity, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
-                        <span>{amenity}</span>
+                      <div key={index} className="flex items-center space-x-3">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <span className="text-base">{amenity}</span>
                       </div>
                     ))
                   ) : (
@@ -202,14 +202,14 @@ export default function PropertyDetail() {
                 </div>
               </TabsContent>
               
-              <TabsContent value="location" className="mt-3">
+              <TabsContent value="location" className="mt-6">
                 <div data-testid="property-location-details">
-                  <p className="text-muted-foreground mb-3 text-sm">
+                  <p className="text-muted-foreground mb-4 text-base">
                     This property is located in {property.location}
                   </p>
                   {property.coordinates && (
-                    <div className="h-48 bg-muted rounded-lg flex items-center justify-center">
-                      <p className="text-muted-foreground text-sm">Map integration would be displayed here</p>
+                    <div className="h-64 bg-muted rounded-lg flex items-center justify-center">
+                      <p className="text-muted-foreground">Map integration would be displayed here</p>
                     </div>
                   )}
                 </div>
@@ -220,17 +220,17 @@ export default function PropertyDetail() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Contact Card */}
-            <Card className="mb-4">
-              <CardContent className="p-4">
-                <h3 className="text-base font-semibold mb-3">Interested in this property?</h3>
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Interested in this property?</h3>
                 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <a 
                     href={callUrl}
                     className="w-full"
                   >
-                    <Button size="sm" className="w-full bg-primary hover:bg-primary/90" data-testid="button-call-property">
-                      <Phone className="h-3 w-3 mr-2" />
+                    <Button className="w-full bg-primary hover:bg-primary/90" data-testid="button-call-property">
+                      <Phone className="h-4 w-4 mr-2" />
                       Call {phoneNumber}
                     </Button>
                   </a>
@@ -241,14 +241,14 @@ export default function PropertyDetail() {
                     rel="noopener noreferrer"
                     className="w-full"
                   >
-                    <Button size="sm" className="w-full bg-green-500 hover:bg-green-600 text-white" data-testid="button-whatsapp-property">
-                      <MessageCircle className="h-3 w-3 mr-2" />
+                    <Button className="w-full bg-green-500 hover:bg-green-600 text-white" data-testid="button-whatsapp-property">
+                      <MessageCircle className="h-4 w-4 mr-2" />
                       WhatsApp {whatsappNumber}
                     </Button>
                   </a>
                   
-                  <Button variant="outline" size="sm" className="w-full" data-testid="button-schedule-viewing">
-                    <Calendar className="h-3 w-3 mr-2" />
+                  <Button variant="outline" className="w-full" data-testid="button-schedule-viewing">
+                    <Calendar className="h-4 w-4 mr-2" />
                     Schedule Viewing
                   </Button>
                 </div>
@@ -257,10 +257,10 @@ export default function PropertyDetail() {
 
             {/* Property Info */}
             <Card>
-              <CardContent className="p-4">
-                <h3 className="text-base font-semibold mb-3">Property Information</h3>
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4">Property Information</h3>
                 
-                <div className="space-y-2 text-sm">
+                <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Property Type:</span>
                     <span className="capitalize" data-testid="property-type">{property.propertyType}</span>
