@@ -96,8 +96,9 @@ export default function PropertyForm({ property, onSuccess }: PropertyFormProps)
         priceETB: property.priceETB,
         status: property.status,
         featured: property.featured,
-        amenities: property.amenities,
-        images: property.images,
+        amenities: property.amenities || [],
+        images: property.images || [],
+        imageFiles: [],
         project: property.project || '',
         coordinates: property.coordinates,
       })
