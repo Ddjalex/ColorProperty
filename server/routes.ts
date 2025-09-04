@@ -208,11 +208,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/blog', requireAuth, async (req, res) => {
     try {
+      console.log('Received blog post data:', req.body);
       const postData = insertBlogPostSchema.parse(req.body);
+      console.log('Parsed blog post data:', postData);
       const post = await storage.createBlogPost(postData);
       res.json(post);
     } catch (error) {
-      res.status(400).json({ message: 'Failed to create blog post' });
+      console.error('Blog post creation error:', error);
+      if (error instanceof Error) {
+        res.status(400).json({ message: 'Failed to create blog post', error: error.message });
+      } else {
+        res.status(400).json({ message: 'Failed to create blog post', error: 'Unknown error' });
+      }
     }
   });
 
