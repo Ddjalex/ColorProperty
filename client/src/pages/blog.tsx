@@ -29,7 +29,7 @@ export default function Blog() {
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
     
-    const matchesTag = !selectedTag || post.tags.includes(selectedTag)
+    const matchesTag = !selectedTag || selectedTag === 'all' || post.tags.includes(selectedTag)
     
     return matchesSearch && matchesTag
   })
@@ -63,7 +63,7 @@ export default function Blog() {
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {allTags.map(tag => (
                 <SelectItem key={tag} value={tag}>{tag}</SelectItem>
               ))}

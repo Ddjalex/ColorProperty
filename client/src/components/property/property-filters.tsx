@@ -25,7 +25,7 @@ export default function PropertyFilters({ onFiltersChange }: PropertyFiltersProp
 
   const applyFilters = () => {
     const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, value]) => value !== '')
+      Object.entries(filters).filter(([_, value]) => value !== '' && value !== 'all' && value !== 'any')
     )
     onFiltersChange(cleanFilters)
   }
@@ -33,9 +33,9 @@ export default function PropertyFilters({ onFiltersChange }: PropertyFiltersProp
   const clearFilters = () => {
     setFilters({
       location: '',
-      propertyType: '',
-      bedrooms: '',
-      status: '',
+      propertyType: 'all',
+      bedrooms: 'any',
+      status: 'all',
       minPrice: '',
       maxPrice: '',
     })
@@ -62,7 +62,7 @@ export default function PropertyFilters({ onFiltersChange }: PropertyFiltersProp
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Types</SelectItem>
+              <SelectItem value="all">All Types</SelectItem>
               <SelectItem value="apartment">Apartment</SelectItem>
               <SelectItem value="house">House</SelectItem>
               <SelectItem value="commercial">Commercial</SelectItem>
@@ -79,7 +79,7 @@ export default function PropertyFilters({ onFiltersChange }: PropertyFiltersProp
               <SelectValue placeholder="Any" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any</SelectItem>
+              <SelectItem value="any">Any</SelectItem>
               <SelectItem value="1">1+</SelectItem>
               <SelectItem value="2">2+</SelectItem>
               <SelectItem value="3">3+</SelectItem>
@@ -95,7 +95,7 @@ export default function PropertyFilters({ onFiltersChange }: PropertyFiltersProp
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Status</SelectItem>
+              <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="active">Active</SelectItem>
               <SelectItem value="sold">Sold</SelectItem>
               <SelectItem value="rented">Rented</SelectItem>
