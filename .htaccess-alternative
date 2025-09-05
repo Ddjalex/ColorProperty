@@ -1,0 +1,31 @@
+# Force specific MIME types - Alternative approach
+RewriteEngine On
+
+# Handle missing assets by checking if files exist first
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_URI} \.(css|js|woff2?|ttf|otf|eot|svg|png|jpe?g|gif|ico|webp|avif)$ [NC]
+RewriteRule . - [R=404,L]
+
+# Client-side routing fallback
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [QSA,L]
+
+# Force correct MIME types using FilesMatch
+<FilesMatch "\.css$">
+    ForceType text/css
+</FilesMatch>
+
+<FilesMatch "\.js$">
+    ForceType application/javascript
+</FilesMatch>
+
+<FilesMatch "\.json$">
+    ForceType application/json
+</FilesMatch>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Error documents
+ErrorDocument 404 /index.html
