@@ -1,0 +1,26 @@
+🚨 FIX: "Detected configuration files" Error
+
+PROBLEM: cPanel can't find package.json file
+
+SOLUTION:
+
+1. UPLOAD THESE FILES to your public_html directory:
+   ✅ package.json (from this folder)
+   ✅ app.js (from this folder) 
+   ✅ All your existing files (index.html, assets/, etc.)
+
+2. CPANEL NODE.JS SETUP:
+   - Application root: /home/temerrua/public_html
+   - Application startup file: app.js
+   - Node.js version: 18.x or higher
+
+3. AFTER UPLOAD:
+   - Refresh the Node.js setup page
+   - You should now see "Run NPM Install" button clickable
+   - Click "Run NPM Install"
+   - Then click "Restart"
+
+4. VISIT YOUR WEBSITE:
+   https://temerrealestatesales.com
+
+This package.json is specifically designed for cPanel hosting and will make the "Detected configuration files" work properly.
