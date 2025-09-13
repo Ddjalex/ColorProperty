@@ -1,0 +1,26 @@
+📁 SIMPLE CPANEL FRONTEND UPLOAD
+
+WHAT THIS FIXES:
+- Shows your real estate website instead of "It works!"
+- Fixes frontend routing
+- Displays properties and hero slider
+- WebSocket errors fixed
+
+UPLOAD INSTRUCTIONS:
+1. Download this entire "cpanel-upload" folder
+2. Upload ALL files to your cPanel public_html directory
+3. Replace existing files when asked
+4. Clear browser cache (Ctrl+F5)
+5. Visit: https://temerrealestatesales.com
+
+FILES INCLUDED:
+✅ index.html - Main website page  
+✅ assets/ - CSS, JavaScript, images
+✅ index.js - Server file
+✅ .htaccess - Frontend routing fix
+
+RESULT:
+- Website shows your real estate homepage
+- Properties display properly  
+- Hero slider works
+- Admin login accessible at /admin/login
