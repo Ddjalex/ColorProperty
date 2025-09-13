@@ -1,0 +1,20 @@
+# Essential cPanel configuration to fix MIME type errors
+RewriteEngine On
+
+# CRITICAL: Don't rewrite asset requests - let them be served normally
+RewriteRule ^assets/ - [L]
+
+# Force correct MIME types (backup method)
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType application/javascript .js
+    AddType application/json .json
+</IfModule>
+
+# Only apply SPA fallback to non-file requests (after assets are excluded)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]
+
+# Prevent directory browsing
+Options -Indexes
