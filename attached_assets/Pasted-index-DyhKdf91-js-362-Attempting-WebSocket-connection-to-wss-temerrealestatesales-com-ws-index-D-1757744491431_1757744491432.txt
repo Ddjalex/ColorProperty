@@ -1,0 +1,40 @@
+index-DyhKdf91.js:362 Attempting WebSocket connection to: wss://temerrealestatesales.com/ws
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: WebSocket is closed before the connection is established.
+(anonymous) @ index-DyhKdf91.js:362
+bf @ index-DyhKdf91.js:40
+ia @ index-DyhKdf91.js:40
+Ui @ index-DyhKdf91.js:40
+$S @ index-DyhKdf91.js:40
+Fs @ index-DyhKdf91.js:40
+ag @ index-DyhKdf91.js:40
+As @ index-DyhKdf91.js:38
+(anonymous) @ index-DyhKdf91.js:40
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+/login:1 [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) <input type=​"password" class=​"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:​border-0 file:​bg-transparent file:​text-sm file:​font-medium file:​text-foreground placeholder:​text-muted-foreground focus-visible:​outline-none focus-visible:​ring-2 focus-visible:​ring-ring focus-visible:​ring-offset-2 disabled:​cursor-not-allowed disabled:​opacity-50 md:​text-sm" id=​"password" required placeholder=​"Enter your password" value>​flex
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
