@@ -1,0 +1,229 @@
+index-DyhKdf91.js:362 Attempting WebSocket connection to: wss://temerrealestatesales.com/ws
+api/hero-slides:1  Failed to load resource: the server responded with a status of 404 ()
+api/settings:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties/featured:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties?limit=6:1  Failed to load resource: the server responded with a status of 404 ()
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+favicon.ico:1  Failed to load resource: the server responded with a status of 404 ()
+api/hero-slides:1  Failed to load resource: the server responded with a status of 404 ()
+api/settings:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties/featured:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties?limit=6:1  Failed to load resource: the server responded with a status of 404 ()
+api/hero-slides:1  Failed to load resource: the server responded with a status of 404 ()
+api/settings:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties/featured:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties?limit=6:1  Failed to load resource: the server responded with a status of 404 ()
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+api/hero-slides:1  Failed to load resource: the server responded with a status of 404 ()
+api/settings:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties/featured:1  Failed to load resource: the server responded with a status of 404 ()
+api/properties?limit=6:1  Failed to load resource: the server responded with a status of 404 ()
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: WebSocket is closed before the connection is established.
+(anonymous) @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+login:1 [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) 
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+ WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+api/auth/login:1  Failed to load resource: the server responded with a status of 404 ()
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362  POST https://temerrealestatesales.com/api/auth/login 404 (Not Found)
+r @ index-DyhKdf91.js:362
+d @ index-DyhKdf91.js:364
+sN @ index-DyhKdf91.js:37
+oN @ index-DyhKdf91.js:37
+aN @ index-DyhKdf91.js:37
+Ap @ index-DyhKdf91.js:37
+Dv @ index-DyhKdf91.js:37
+(anonymous) @ index-DyhKdf91.js:37
+Xh @ index-DyhKdf91.js:40
+av @ index-DyhKdf91.js:37
+ad @ index-DyhKdf91.js:37
+Ch @ index-DyhKdf91.js:37
+NN @ index-DyhKdf91.js:37
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
+index-DyhKdf91.js:362 WebSocket connection to 'wss://temerrealestatesales.com/ws' failed: 
+o @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket error: Event {isTrusted: true, type: 'error', target: WebSocket, currentTarget: WebSocket, eventPhase: 2, …}
+t.current.onerror @ index-DyhKdf91.js:362
+index-DyhKdf91.js:362 WebSocket connection closed, attempting to reconnect...
