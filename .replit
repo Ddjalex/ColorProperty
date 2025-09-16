@@ -47,7 +47,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd backend && BACKEND_PORT=3001 NODE_ENV=development npm start"
+args = "cd backend && MONGODB_URI=\"mongodb+srv://walmeseged_db_user:A1l2m3e4s5@gift.k3fycs2.mongodb.net/?retryWrites=true&w=majority&appName=Gift\" BACKEND_PORT=3001 NODE_ENV=development npm start"
 waitForPort = 3001
 
 [workflows.workflow.metadata]
@@ -64,7 +64,3 @@ externalPort = 3000
 [[ports]]
 localPort = 3001
 externalPort = 3001
-
-[[ports]]
-localPort = 33925
-externalPort = 80
