@@ -80,11 +80,6 @@ export default function Login() {
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </form>
-            <div className="mt-4 text-sm text-center text-muted-foreground">
-              <p>Default credentials for testing:</p>
-              <p>Email: admin@temer.com</p>
-              <p>Password: TempAdmin2024!ChangeMe</p>
-            </div>
           </CardContent>
         </Card>
       </div>
