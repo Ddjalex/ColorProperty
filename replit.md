@@ -2,6 +2,19 @@
 
 This is a modern real estate website and admin dashboard for Temer Properties, built to showcase properties in Ethiopia. The application provides a comprehensive property listing platform with advanced filtering, property management, team showcases, blog functionality, and lead management capabilities. It features a public-facing website for property browsing and an admin dashboard for content management.
 
+# Recent Changes
+
+## September 16, 2025 - Replit Environment Setup
+- Successfully imported GitHub project and configured for Replit environment
+- Installed Node.js and all dependencies (frontend and backend)
+- Configured secure environment variables: JWT_SECRET, ADMIN_INIT_SECRET, MONGODB_URI
+- Set up proper workflows: Frontend (port 5000), Backend (port 3001)  
+- Updated backend to serve static frontend files in production
+- Configured autoscale deployment with proper port handling (production uses port 5000)
+- All services running successfully with MongoDB Atlas connection
+- Website fully functional with property listings and admin capabilities
+- Fixed security issue: moved MongoDB URI from workflow to encrypted secrets
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.

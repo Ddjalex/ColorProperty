@@ -7,8 +7,8 @@ channel = "stable-25_05"
 
 [deployment]
 deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
-run = ["bash", "-c", "cd backend && npm start & cd ../frontend && npm run build && npx vite preview --host 0.0.0.0 --port 5000"]
+build = ["bash", "-c", "cd frontend && npm run build"]
+run = ["bash", "-c", "cd backend && NODE_ENV=production npm start"]
 
 [env]
 PORT = "5000"
@@ -23,11 +23,19 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Frontend"
+args = "Backend"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Backend"
+args = "Frontend"
+
+[[workflows.workflow]]
+name = "Backend"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && BACKEND_PORT=3001 NODE_ENV=development npm start"
 
 [[workflows.workflow]]
 name = "Frontend"
@@ -40,18 +48,6 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
-
-[[workflows.workflow]]
-name = "Backend"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd backend && MONGODB_URI=\"mongodb+srv://walmeseged_db_user:A1l2m3e4s5@gift.k3fycs2.mongodb.net/?retryWrites=true&w=majority&appName=Gift\" BACKEND_PORT=3001 NODE_ENV=development npm start"
-waitForPort = 3001
-
-[workflows.workflow.metadata]
-outputType = "console"
 
 [agent]
 expertMode = true
@@ -70,5 +66,5 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 46619
+localPort = 33381
 externalPort = 3002

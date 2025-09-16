@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const routes = require('./routes');
 
 const app = express();
@@ -9,6 +10,12 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Serve static files from frontend build in production
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
+  app.use(express.static(frontendBuildPath));
+}
 
 // Routes
 app.use('/api', routes);
@@ -72,14 +79,22 @@ app.use((error, req, res, next) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
+// Catch-all handler for frontend routes in production
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req, res) => {
+    const frontendBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+} else {
+  // 404 handler for development
+  app.use('*', (req, res) => {
+    res.status(404).json({ message: 'Route not found' });
+  });
+}
 
 // Start server
 async function startServer() {
-  const PORT = process.env.BACKEND_PORT || 3001;
+  const PORT = process.env.PORT || process.env.BACKEND_PORT || (process.env.NODE_ENV === 'production' ? 5000 : 3001);
   
   try {
     // Connect to MongoDB database
