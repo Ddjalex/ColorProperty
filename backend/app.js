@@ -21,8 +21,19 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Initialize admin user endpoint
+// SECURED: Initialize admin user endpoint (only in development mode with secret)
 app.post('/api/init-admin', async (req, res) => {
+  // Security check: Only allow in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    return res.status(403).json({ message: 'Admin initialization not allowed in production' });
+  }
+
+  // Security check: Require secret key
+  const initSecret = req.headers['x-init-secret'] || req.body.initSecret;
+  if (!initSecret || initSecret !== 'TEMP_INIT_SECRET_2024') {
+    return res.status(401).json({ message: 'Invalid initialization secret' });
+  }
+
   try {
     const storage = require('./storage');
     const existingAdmin = await storage.getUserByEmail('admin@temer.com');
@@ -30,15 +41,21 @@ app.post('/api/init-admin', async (req, res) => {
       return res.json({ message: 'Admin user already exists' });
     }
 
+    // Use strong password (should be changed on first login)
     const adminUser = await storage.createUser({
       name: 'Admin User',
       email: 'admin@temer.com',
-      passwordHash: 'admin123',
+      passwordHash: 'TempAdmin2024!ChangeMe',
       role: 'admin'
     });
 
-    res.json({ message: 'Admin user created', user: { ...adminUser, passwordHash: undefined } });
+    res.json({ 
+      message: 'Admin user created - CHANGE PASSWORD IMMEDIATELY', 
+      user: { ...adminUser, passwordHash: undefined },
+      warning: 'Change the default password immediately after first login'
+    });
   } catch (error) {
+    console.error('Admin initialization error:', error);
     res.status(500).json({ message: 'Failed to create admin user' });
   }
 });

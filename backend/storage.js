@@ -116,7 +116,7 @@ class MongoStorage {
       const limit = parseInt(filters.limit) || 12;
       const skip = (page - 1) * limit;
 
-      const total = await collection.countDocuments(query, { hint: { createdAt: -1 } });
+      const total = await collection.countDocuments(query);
       
       const properties = await collection
         .find(query, {
@@ -132,8 +132,8 @@ class MongoStorage {
             priceETB: 1,
             status: 1,
             featured: 1,
-            imageCount: { $size: { $ifNull: ["$images", []] } },
-            amenities: { $slice: 3 },
+            images: 1,
+            amenities: 1,
             coordinates: 1,
             createdAt: 1
           }
@@ -141,7 +141,6 @@ class MongoStorage {
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
-        .hint({ createdAt: -1 })
         .toArray();
       
       return { properties, total };
@@ -263,8 +262,8 @@ class MongoStorage {
             priceETB: 1,
             status: 1,
             featured: 1,
-            imageCount: { $size: { $ifNull: ["$images", []] } },
-            amenities: { $slice: 3 },
+            images: 1,
+            amenities: 1,
             coordinates: 1,
             createdAt: 1
           }
