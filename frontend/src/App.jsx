@@ -67,26 +67,26 @@ function App() {
           <Header />
           <main>
             <Switch>
-              <Route path="/" component={Home} />
-              <Route path="/properties" component={Properties} />
-              <Route path="/property/:slug" component={PropertyDetail} />
-              <Route path="/team" component={Team} />
-              <Route path="/blog" component={Blog} />
-              <Route path="/blog/:slug" component={BlogPost} />
-              <Route path="/contact" component={Contact} />
-              <Route path="/login" component={Login} />
+              <Route path="/">{() => <Home />}</Route>
+              <Route path="/properties">{() => <Properties />}</Route>
+              <Route path="/property/:slug">{(params) => <PropertyDetail {...params} />}</Route>
+              <Route path="/team">{() => <Team />}</Route>
+              <Route path="/blog">{() => <Blog />}</Route>
+              <Route path="/blog/:slug">{(params) => <BlogPost {...params} />}</Route>
+              <Route path="/contact">{() => <Contact />}</Route>
+              <Route path="/login">{() => <Login />}</Route>
               
               {/* Admin Routes */}
-              <Route path="/admin" component={Dashboard} />
-              <Route path="/admin/dashboard" component={Dashboard} />
-              <Route path="/admin/properties" component={AdminProperties} />
-              <Route path="/admin/team" component={AdminTeam} />
-              <Route path="/admin/blog" component={AdminBlog} />
-              <Route path="/admin/hero-slides" component={AdminHeroSlides} />
-              <Route path="/admin/leads" component={AdminLeads} />
-              <Route path="/admin/settings" component={AdminSettings} />
+              <Route path="/admin">{() => <Dashboard />}</Route>
+              <Route path="/admin/dashboard">{() => <Dashboard />}</Route>
+              <Route path="/admin/properties">{() => <AdminProperties />}</Route>
+              <Route path="/admin/team">{() => <AdminTeam />}</Route>
+              <Route path="/admin/blog">{() => <AdminBlog />}</Route>
+              <Route path="/admin/hero-slides">{() => <AdminHeroSlides />}</Route>
+              <Route path="/admin/leads">{() => <AdminLeads />}</Route>
+              <Route path="/admin/settings">{() => <AdminSettings />}</Route>
               
-              <Route component={NotFound} />
+              <Route>{() => <NotFound />}</Route>
             </Switch>
           </main>
           <Footer />
