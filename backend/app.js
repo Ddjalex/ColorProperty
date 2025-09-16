@@ -82,14 +82,14 @@ async function startServer() {
   const PORT = process.env.BACKEND_PORT || 3001;
   
   try {
-    // Try to connect to database (optional for testing)
-    if (process.env.MONGODB_URI && process.env.MONGODB_URI !== 'mongodb+srv://username:password@cluster.mongodb.net/') {
+    // Connect to MongoDB database
+    try {
       const { connectToDatabase } = require('./db');
       await connectToDatabase();
       console.log('Database connected successfully');
-    } else {
-      console.log('Database connection skipped (no valid MongoDB URI configured)');
-      console.log('Server will run without database for testing purposes');
+    } catch (error) {
+      console.error('Database connection failed:', error.message);
+      console.log('Please check your MongoDB connection string');
     }
     
     app.listen(PORT, '0.0.0.0', () => {

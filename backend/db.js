@@ -10,7 +10,7 @@ async function connectToDatabase() {
       return { db, client };
     }
 
-    const uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGODB_URI || 'mongodb+srv://walmeseged_db_user:A1l2m3e4s5@gift.k3fycs2.mongodb.net/?retryWrites=true&w=majority&appName=Gift';
     
     if (!uri) {
       throw new Error('MONGODB_URI environment variable is not set');
