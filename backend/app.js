@@ -5,7 +5,8 @@ const { connectToDatabase } = require('./db');
 const routes = require('./routes');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+// Force backend to use port 3001 (port 5000 is reserved for frontend in Replit)
+const PORT = 3001;
 
 // Middleware
 app.use(cors());

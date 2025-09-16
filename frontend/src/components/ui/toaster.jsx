@@ -1,12 +1,4 @@
-import { Toaster as SonnerToaster } from 'sonner';
-
+// Simple toast component - can be enhanced later
 export function Toaster() {
-  return (
-    <SonnerToaster
-      position="top-right"
-      richColors
-      closeButton
-      duration={4000}
-    />
-  );
+  return <div id="toast-container" className="fixed top-4 right-4 z-50" />;
 }
