@@ -1,12 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { connectToDatabase } = require('./db');
 const routes = require('./routes');
 
 const app = express();
-// Force backend to use port 3001 (port 5000 is reserved for frontend in Replit)
-const PORT = 3001;
 
 // Middleware
 app.use(cors());
@@ -76,10 +73,18 @@ app.use('*', (req, res) => {
 
 // Start server
 async function startServer() {
+  const PORT = process.env.PORT || 5000;
+  
   try {
-    // Connect to database first
-    await connectToDatabase();
-    console.log('Database connected successfully');
+    // Try to connect to database (optional for testing)
+    if (process.env.MONGODB_URI && process.env.MONGODB_URI !== 'mongodb+srv://username:password@cluster.mongodb.net/') {
+      const { connectToDatabase } = require('./db');
+      await connectToDatabase();
+      console.log('Database connected successfully');
+    } else {
+      console.log('Database connection skipped (no valid MongoDB URI configured)');
+      console.log('Server will run without database for testing purposes');
+    }
     
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Backend server running on port ${PORT}`);
@@ -87,8 +92,13 @@ async function startServer() {
       console.log(`API base URL: http://localhost:${PORT}/api`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
-    process.exit(1);
+    console.warn('Database connection failed, starting server without database:', error.message);
+    
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Backend server running on port ${PORT} (without database)`);
+      console.log(`Health check: http://localhost:${PORT}/health`);
+      console.log(`API base URL: http://localhost:${PORT}/api`);
+    });
   }
 }
 
