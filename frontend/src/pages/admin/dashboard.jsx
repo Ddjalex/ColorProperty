@@ -35,21 +35,33 @@ export default function Dashboard() {
         'Content-Type': 'application/json'
       }
 
-      // Fetch data from all endpoints
-      const [propertiesRes, heroSlidesRes, teamRes, blogRes, leadsRes] = await Promise.all([
-        fetch('/api/properties'),
-        fetch('/api/hero-slides'),
-        fetch('/api/team'),
-        fetch('/api/blog'),
-        fetch('/api/leads', { headers })
-      ])
+      // Use shared apiRequest helper for consistent API calls
+      const apiRequest = async (url, options = {}) => {
+        const apiBase = import.meta.env.VITE_API_URL?.trim()
+        const fullUrl = url.startsWith('http') ? url : apiBase ? `${apiBase}${url.startsWith('/') ? '' : '/'}${url}` : url
+        
+        const response = await fetch(fullUrl, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+          ...options,
+        })
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        return response.json()
+      }
 
+      // Fetch data from all endpoints
       const [properties, heroSlides, team, blog, leads] = await Promise.all([
-        propertiesRes.json(),
-        heroSlidesRes.json(),
-        teamRes.json(),
-        blogRes.json(),
-        leadsRes.json()
+        apiRequest('/api/properties'),
+        apiRequest('/api/hero-slides'),
+        apiRequest('/api/team'),
+        apiRequest('/api/blog'),
+        apiRequest('/api/leads', { headers })
       ])
 
       setStats({
@@ -142,10 +154,10 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background py-12">
-        <div className="container mx-auto px-4">
+      <div className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Admin Dashboard</h1>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">Dashboard</h1>
             <p className="text-lg text-muted-foreground mb-8">Loading...</p>
           </div>
         </div>
@@ -154,11 +166,11 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-8">
-      <div className="container mx-auto px-4">
+    <div className="py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Admin Dashboard</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">Dashboard</h1>
           <p className="text-lg text-muted-foreground">
             Welcome back! Manage your properties and content.
           </p>
