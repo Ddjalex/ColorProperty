@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Route, Switch } from 'wouter'
 import { Toaster } from '@/components/ui/toaster'
 import { WhatsAppFloat } from '@/components/ui/whatsapp-float'
+import { AuthProvider } from '@/lib/auth'
 
 // Pages
 import Home from '@/pages/home'
@@ -61,35 +62,37 @@ const queryClient = new QueryClient({
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen bg-background text-foreground">
-        <Header />
-        <main>
-          <Switch>
-            <Route path="/" component={Home} />
-            <Route path="/properties" component={Properties} />
-            <Route path="/property/:slug" component={PropertyDetail} />
-            <Route path="/team" component={Team} />
-            <Route path="/blog" component={Blog} />
-            <Route path="/blog/:slug" component={BlogPost} />
-            <Route path="/contact" component={Contact} />
-            <Route path="/login" component={Login} />
-            
-            {/* Admin Routes */}
-            <Route path="/admin" component={Dashboard} />
-            <Route path="/admin/properties" component={AdminProperties} />
-            <Route path="/admin/team" component={AdminTeam} />
-            <Route path="/admin/blog" component={AdminBlog} />
-            <Route path="/admin/hero-slides" component={AdminHeroSlides} />
-            <Route path="/admin/leads" component={AdminLeads} />
-            <Route path="/admin/settings" component={AdminSettings} />
-            
-            <Route component={NotFound} />
-          </Switch>
-        </main>
-        <Footer />
-        <WhatsAppFloat />
-        <Toaster />
-      </div>
+      <AuthProvider>
+        <div className="min-h-screen bg-background text-foreground">
+          <Header />
+          <main>
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/properties" component={Properties} />
+              <Route path="/property/:slug" component={PropertyDetail} />
+              <Route path="/team" component={Team} />
+              <Route path="/blog" component={Blog} />
+              <Route path="/blog/:slug" component={BlogPost} />
+              <Route path="/contact" component={Contact} />
+              <Route path="/login" component={Login} />
+              
+              {/* Admin Routes */}
+              <Route path="/admin" component={Dashboard} />
+              <Route path="/admin/properties" component={AdminProperties} />
+              <Route path="/admin/team" component={AdminTeam} />
+              <Route path="/admin/blog" component={AdminBlog} />
+              <Route path="/admin/hero-slides" component={AdminHeroSlides} />
+              <Route path="/admin/leads" component={AdminLeads} />
+              <Route path="/admin/settings" component={AdminSettings} />
+              
+              <Route component={NotFound} />
+            </Switch>
+          </main>
+          <Footer />
+          <WhatsAppFloat />
+          <Toaster />
+        </div>
+      </AuthProvider>
     </QueryClientProvider>
   )
 }
