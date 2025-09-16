@@ -27,6 +27,7 @@ import AdminSettings from '@/pages/admin/settings'
 // Layout Components
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
+import ProtectedRoute from '@/components/protected-route'
 
 // Global fetch function for API calls
 const apiRequest = async (url, options = {}) => {
@@ -76,15 +77,15 @@ function App() {
               <Route path="/contact">{() => <Contact />}</Route>
               <Route path="/login">{() => <Login />}</Route>
               
-              {/* Admin Routes */}
-              <Route path="/admin">{() => <Dashboard />}</Route>
-              <Route path="/admin/dashboard">{() => <Dashboard />}</Route>
-              <Route path="/admin/properties">{() => <AdminProperties />}</Route>
-              <Route path="/admin/team">{() => <AdminTeam />}</Route>
-              <Route path="/admin/blog">{() => <AdminBlog />}</Route>
-              <Route path="/admin/hero-slides">{() => <AdminHeroSlides />}</Route>
-              <Route path="/admin/leads">{() => <AdminLeads />}</Route>
-              <Route path="/admin/settings">{() => <AdminSettings />}</Route>
+              {/* Admin Routes - Protected */}
+              <Route path="/admin">{() => <ProtectedRoute><Dashboard /></ProtectedRoute>}</Route>
+              <Route path="/admin/dashboard">{() => <ProtectedRoute><Dashboard /></ProtectedRoute>}</Route>
+              <Route path="/admin/properties">{() => <ProtectedRoute><AdminProperties /></ProtectedRoute>}</Route>
+              <Route path="/admin/team">{() => <ProtectedRoute><AdminTeam /></ProtectedRoute>}</Route>
+              <Route path="/admin/blog">{() => <ProtectedRoute><AdminBlog /></ProtectedRoute>}</Route>
+              <Route path="/admin/hero-slides">{() => <ProtectedRoute><AdminHeroSlides /></ProtectedRoute>}</Route>
+              <Route path="/admin/leads">{() => <ProtectedRoute><AdminLeads /></ProtectedRoute>}</Route>
+              <Route path="/admin/settings">{() => <ProtectedRoute><AdminSettings /></ProtectedRoute>}</Route>
               
               <Route>{() => <NotFound />}</Route>
             </Switch>
