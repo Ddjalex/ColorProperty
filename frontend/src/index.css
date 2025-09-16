@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Temer Properties Brand Colors */
+  --primary: 215 100% 48%;         /* Blue #0066ff */
+  --primary-foreground: 0 0% 100%; /* White */
+  --secondary: 220 14% 96%;        /* Light Gray */
+  --secondary-foreground: 220 9% 46%; /* Dark Gray */
+  --accent: 39 100% 60%;           /* Orange #ff9900 */
+  --accent-foreground: 0 0% 100%;  /* White */
+  
+  /* Neutral Colors */
+  --background: 0 0% 100%;         /* White */
+  --foreground: 224 71% 4%;        /* Dark Blue */
+  --muted: 220 14% 96%;            /* Light Gray */
+  --muted-foreground: 220 9% 46%;  /* Medium Gray */
+  --card: 0 0% 100%;               /* White */
+  --card-foreground: 224 71% 4%;   /* Dark Blue */
+  --popover: 0 0% 100%;            /* White */
+  --popover-foreground: 224 71% 4%; /* Dark Blue */
+  
+  /* UI Colors */
+  --border: 220 13% 91%;           /* Light Border */
+  --input: 220 13% 91%;            /* Input Border */
+  --ring: 215 100% 48%;            /* Focus Ring */
+  --destructive: 0 84% 60%;        /* Red */
+  --destructive-foreground: 0 0% 100%; /* White */
+  
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 224 71% 4%;        /* Dark Blue */
+  --foreground: 0 0% 98%;          /* Light */
+  --muted: 215 28% 17%;            /* Dark Muted */
+  --muted-foreground: 215 20% 65%; /* Light Muted */
+  --card: 224 71% 4%;              /* Dark Blue */
+  --card-foreground: 0 0% 98%;     /* Light */
+  --popover: 224 71% 4%;           /* Dark Blue */
+  --popover-foreground: 0 0% 98%;  /* Light */
+  --border: 215 28% 17%;           /* Dark Border */
+  --input: 215 28% 17%;            /* Dark Input */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .hero-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%);
+  }
+  
+  .property-card-hover {
+    @apply transition-all duration-300 hover:scale-105 hover:shadow-xl;
+  }
+  
+  .nav-link {
+    @apply relative text-muted-foreground hover:text-foreground transition-colors duration-200;
+  }
+  
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-primary transition-all duration-300;
+  }
+  
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 font-medium;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+}
