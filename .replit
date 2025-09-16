@@ -35,7 +35,11 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd backend && BACKEND_PORT=3001 NODE_ENV=development npm start"
+args = "cd backend && npm start"
+waitForPort = 3001
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [[workflows.workflow]]
 name = "Frontend"
@@ -62,9 +66,9 @@ localPort = 3001
 externalPort = 3001
 
 [[ports]]
-localPort = 5000
-externalPort = 80
-
-[[ports]]
 localPort = 46489
 externalPort = 3002
+
+[[ports]]
+localPort = 5000
+externalPort = 80
