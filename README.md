@@ -1,39 +1,63 @@
-# Temer Properties - Real Estate Application
+# Temer Properties - Property Management Website
 
-A professional full-stack real estate application with separate frontend and backend services.
+A modern property management website built with separate frontend and backend architecture, converted from TypeScript to pure JavaScript with CommonJS modules.
 
 ## Project Structure
 
 ```
-root/
-  frontend/          # React + Vite + TailwindCSS frontend
-    package.json
-    vite.config.js
-    src/
-      pages/          # Application pages
-      components/     # Reusable components
-      lib/           # Utility functions
-      index.css      # Global styles
-  backend/           # Express.js + MongoDB API
-    app.js           # Main server file
-    routes/          # API route handlers
-    db.js           # MongoDB connection
-    storage.js      # Database operations
-    middleware/     # Auth middleware
-    package.json
-    .env           # Environment variables
-  README.md
+.
+├── frontend/           # React + Vite frontend application (JavaScript)
+│   ├── src/
+│   │   ├── components/    # Reusable UI components
+│   │   ├── pages/         # Application pages
+│   │   │   ├── admin/     # Admin dashboard pages
+│   │   │   ├── blog.jsx
+│   │   │   ├── blog-post.jsx
+│   │   │   ├── contact.jsx
+│   │   │   └── home.jsx
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── lib/           # Utility functions
+│   │   ├── assets/        # Static assets
+│   │   ├── App.jsx        # Main application component
+│   │   ├── main.jsx       # Application entry point
+│   │   └── index.css      # Global styles with Tailwind
+│   ├── package.json       # Frontend dependencies
+│   ├── vite.config.js     # Vite configuration
+│   ├── tailwind.config.js # Tailwind CSS configuration
+│   └── index.html         # HTML template
+│
+└── backend/            # Express.js backend API (CommonJS modules)
+    ├── models/            # Database models
+    │   ├── userModel.js
+    │   └── propertyModel.js
+    ├── routes/            # API route handlers
+    │   ├── auth.js
+    │   ├── properties.js
+    │   ├── blog.js
+    │   ├── team.js
+    │   ├── heroSlides.js
+    │   ├── leads.js
+    │   ├── settings.js
+    │   └── index.js
+    ├── middleware/        # Express middleware
+    │   └── auth.js
+    ├── app.js            # Express application setup
+    ├── db.js             # Database connection
+    ├── storage.js        # Storage interface
+    └── package.json      # Backend dependencies
 ```
 
 ## Features
 
-- **Frontend**: React application with modern UI using TailwindCSS
-- **Backend**: RESTful API with Express.js and MongoDB
+- **Frontend**: React 18 application with modern JavaScript (no TypeScript)
+- **Backend**: RESTful API with Express.js and MongoDB using CommonJS modules
 - **Authentication**: JWT-based authentication system
-- **Real Estate Features**: Properties, hero slides, team management, blog, leads
-- **Admin Dashboard**: Protected admin routes for content management
-- **Responsive Design**: Mobile-friendly interface
+- **Property Management**: Full CRUD operations for properties, team, blog, leads
+- **Admin Dashboard**: Complete admin interface for content management
+- **Modern UI**: Shadcn/ui components with Tailwind CSS and dark mode support
+- **Responsive Design**: Mobile-first responsive interface
 - **WhatsApp Integration**: Direct contact via WhatsApp
+- **SEO Optimized**: Proper meta tags and Open Graph support
 
 ## Prerequisites
 
@@ -59,15 +83,17 @@ npm install
 
 #### Backend Environment (backend/.env)
 ```env
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
+MONGODB_URI=mongodb://localhost:27017/temer-properties
+JWT_SECRET=your-super-secret-jwt-key
 NODE_ENV=development
-PORT=3001
+PORT=5000
+ADMIN_INIT_SECRET=your-secure-admin-init-secret-here
 ```
 
 #### Frontend Environment (frontend/.env)
 ```env
-VITE_API_URL=http://localhost:3001/api
+VITE_API_URL=http://localhost:5000/api
+VITE_APP_TITLE=Temer Properties
 ```
 
 ### 3. Running the Application
@@ -77,16 +103,16 @@ VITE_API_URL=http://localhost:3001/api
 **Start Backend (Terminal 1):**
 ```bash
 cd backend
-npm start
+node app.js
 ```
-Backend will run on: http://localhost:3001
+Backend will run on: http://localhost:5000
 
 **Start Frontend (Terminal 2):**
 ```bash
 cd frontend
 npm run dev
 ```
-Frontend will run on: http://localhost:5000
+Frontend will run on: http://localhost:3000
 
 #### Option 2: Production Build
 
@@ -133,41 +159,50 @@ npm run preview
 - Wouter for lightweight routing
 
 ### Backend Development
-- Express.js server with CommonJS modules
-- MongoDB with native driver
-- JWT authentication
+- Express.js server with **pure CommonJS modules** (require/module.exports)
+- **MongoDB with native driver** (not Mongoose) for lightweight performance
+- JWT authentication with bcrypt password hashing
 - CORS enabled for frontend communication
-- Comprehensive error handling
+- Comprehensive error handling and graceful database connection failures
+- **No ES modules** - strictly CommonJS for compatibility
 
 ## Technology Stack
 
 ### Frontend
-- React 18
-- Vite 5
-- TailwindCSS 3
-- React Query (TanStack Query)
-- Wouter (routing)
-- Radix UI components
-- Lucide React (icons)
+- **React 18** - Pure JavaScript (no TypeScript)
+- **Vite 5** - Fast development and build tool
+- **TailwindCSS 3** - Utility-first CSS framework
+- **Shadcn/ui** - Modern component library built on Radix UI
+- **Wouter** - Lightweight client-side routing
+- **Lucide React** - Beautiful icon library
+- **React Hook Form** - Efficient form handling
+- **Dark/Light Theme** - Built-in theme switching
 
 ### Backend
-- Node.js
-- Express.js 4
-- MongoDB 6
-- JWT for authentication
-- bcrypt for password hashing
-- CORS for cross-origin requests
+- **Node.js** - JavaScript runtime
+- **Express.js 4** - Web framework with CommonJS modules
+- **MongoDB 6** - Native driver (not Mongoose) for optimal performance
+- **JWT** - JSON Web Tokens for authentication
+- **bcrypt** - Secure password hashing
+- **CORS** - Cross-origin request handling
 
-## Default Admin User
+## Admin User Initialization (Development Only)
 
-After starting the backend, you can create an admin user by making a POST request to:
+In development mode, you can create an admin user by making a POST request to:
 ```
-POST http://localhost:3001/api/init-admin
+POST http://localhost:5000/api/init-admin
 ```
 
-Default credentials:
+**Requirements:**
+- Set `ADMIN_INIT_SECRET` in your backend .env file
+- Include the secret in request header: `x-init-secret: your-secret-value`
+- Only works when `NODE_ENV=development`
+
+**Default credentials created:**
 - Email: admin@temer.com
-- Password: admin123
+- Password: TempAdmin2024!ChangeMe
+
+**⚠️ IMPORTANT:** Change the password immediately after first login for security.
 
 ## Production Deployment
 

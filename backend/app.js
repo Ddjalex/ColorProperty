@@ -25,9 +25,15 @@ app.post('/api/init-admin', async (req, res) => {
     return res.status(403).json({ message: 'Admin initialization not allowed in production' });
   }
 
-  // Security check: Require secret key
+  // Security check: Require secret key from environment
   const initSecret = req.headers['x-init-secret'] || req.body.initSecret;
-  if (!initSecret || initSecret !== 'TEMP_INIT_SECRET_2024') {
+  const requiredSecret = process.env.ADMIN_INIT_SECRET;
+  
+  if (!requiredSecret) {
+    return res.status(500).json({ message: 'Admin initialization secret not configured' });
+  }
+  
+  if (!initSecret || initSecret !== requiredSecret) {
     return res.status(401).json({ message: 'Invalid initialization secret' });
   }
 
@@ -38,17 +44,17 @@ app.post('/api/init-admin', async (req, res) => {
       return res.json({ message: 'Admin user already exists' });
     }
 
-    // Use strong password (should be changed on first login)
+    // Pass plain password - storage layer will handle hashing
     const adminUser = await storage.createUser({
       name: 'Admin User',
       email: 'admin@temer.com',
-      passwordHash: 'TempAdmin2024!ChangeMe',
+      password: 'TempAdmin2024!ChangeMe', // Plain password, not passwordHash
       role: 'admin'
     });
 
     res.json({ 
       message: 'Admin user created - CHANGE PASSWORD IMMEDIATELY', 
-      user: { ...adminUser, passwordHash: undefined },
+      user: { ...adminUser, password: undefined, passwordHash: undefined },
       warning: 'Change the default password immediately after first login'
     });
   } catch (error) {

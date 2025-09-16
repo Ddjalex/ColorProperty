@@ -27,16 +27,6 @@ import AdminSettings from '@/pages/admin/settings'
 import Header from '@/components/layout/header'
 import Footer from '@/components/layout/footer'
 
-// Query Client Setup
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      cacheTime: 1000 * 60 * 10, // 10 minutes
-    },
-  },
-})
-
 // Global fetch function for API calls
 const apiRequest = async (url, options = {}) => {
   const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
@@ -57,9 +47,15 @@ const apiRequest = async (url, options = {}) => {
   return response.json()
 }
 
-// Set the default query function
-queryClient.setQueryDefaults(['default'], {
-  queryFn: ({ queryKey }) => apiRequest(queryKey[0]),
+// Query Client Setup with proper default queryFn
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      queryFn: ({ queryKey }) => apiRequest(queryKey[0]),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes (updated from deprecated cacheTime)
+    },
+  },
 })
 
 function App() {
