@@ -40,12 +40,18 @@ export function AuthProvider({ children }) {
   }
 
   const login = async (email, password) => {
+    // Normalize input to handle common user input variations
+    const normalized = { 
+      email: email.trim().toLowerCase(), 
+      password: password.trim() 
+    };
+    
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify(normalized)
     })
 
     if (response.ok) {
