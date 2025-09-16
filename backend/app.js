@@ -79,7 +79,7 @@ app.use('*', (req, res) => {
 
 // Start server
 async function startServer() {
-  const PORT = process.env.PORT || 5000;
+  const PORT = process.env.BACKEND_PORT || 3001;
   
   try {
     // Try to connect to database (optional for testing)
