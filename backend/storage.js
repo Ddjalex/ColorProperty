@@ -253,7 +253,7 @@ class MongoStorage {
     try {
       const collection = await this.getCollection('properties');
       const properties = await collection
-        .find({ featured: true, status: 'active' }, {
+        .find({ featured: true }, {
           projection: {
             title: 1,
             slug: 1,
@@ -452,7 +452,7 @@ class MongoStorage {
     try {
       const collection = await this.getCollection('hero_slides');
       const slides = await collection
-        .find({ isActive: true })
+        .find({})
         .sort({ order: 1 })
         .toArray();
       return slides;

@@ -33,6 +33,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+
 // SECURED: Initialize admin user endpoint (only in development mode with secret)
 app.post('/api/init-admin', async (req, res) => {
   // Security check: Only allow in development mode
