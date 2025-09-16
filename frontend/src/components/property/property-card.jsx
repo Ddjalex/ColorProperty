@@ -62,7 +62,7 @@ export default function PropertyCard({ property }) {
           className="w-full h-48 object-cover"
           loading="lazy"
           onError={(e) => {
-            e.target.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop'
+            e.target.src = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop&auto=format'
           }}
           data-testid={`property-image-${property._id}`}
         />

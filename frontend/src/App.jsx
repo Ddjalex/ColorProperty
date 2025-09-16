@@ -78,6 +78,7 @@ function App() {
               
               {/* Admin Routes */}
               <Route path="/admin" component={Dashboard} />
+              <Route path="/admin/dashboard" component={Dashboard} />
               <Route path="/admin/properties" component={AdminProperties} />
               <Route path="/admin/team" component={AdminTeam} />
               <Route path="/admin/blog" component={AdminBlog} />
