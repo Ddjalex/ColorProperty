@@ -12,15 +12,17 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: true,
-    hmr: {
-      clientPort: 5000
+    strictPort: true,
+    hmr: false,
+    watch: {
+      usePolling: true
     },
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
-        secure: false
+        secure: false,
+        ws: false
       }
     }
   },

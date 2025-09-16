@@ -94,7 +94,7 @@ if (process.env.NODE_ENV === 'production') {
 
 // Start server
 async function startServer() {
-  const PORT = process.env.PORT || process.env.BACKEND_PORT || (process.env.NODE_ENV === 'production' ? 5000 : 3001);
+  const PORT = process.env.BACKEND_PORT || (process.env.NODE_ENV === 'production' ? process.env.PORT || 5000 : 3001);
   
   try {
     // Connect to MongoDB database
