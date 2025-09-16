@@ -11,8 +11,10 @@ export default function HeroSlider() {
     queryKey: ['/api/hero-slides'],
   })
 
-  // Use only active slides from admin panel
-  const slides = apiSlides.filter(slide => slide.isActive).sort((a, b) => (a.order || 0) - (b.order || 0))
+  // Use only active slides from admin panel (treat missing isActive as active)
+  const slides = (apiSlides || [])
+    .filter(slide => slide.isActive !== false)
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
 
   useEffect(() => {
     if (slides.length === 0) return
@@ -93,9 +95,9 @@ export default function HeroSlider() {
           }`}
         >
           <div className="relative h-full">
-            {slide.backgroundImage && (
+            {(slide.backgroundImage || slide.imageUrl) && (
               <img
-                src={slide.backgroundImage}
+                src={slide.backgroundImage || slide.imageUrl}
                 alt={slide.title}
                 className="w-full h-full object-cover"
               />
