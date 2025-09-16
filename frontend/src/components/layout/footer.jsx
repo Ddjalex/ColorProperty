@@ -1,5 +1,5 @@
 import { Link } from 'wouter'
-import { Phone, Mail, MapPin } from 'lucide-react'
+import { Phone, Mail, MapPin, Send } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -32,6 +32,13 @@ export default function Footer() {
               <div className="flex items-center space-x-2">
                 <MapPin className="w-4 h-4 text-primary" />
                 <span>Addis Ababa, Ethiopia</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Send className="w-4 h-4 text-primary" />
+                <a href="https://t.me/Ethioads012" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 transition-colors">
+                  t.me/Ethioads012
+                </a>
+                <span className="text-xs text-gray-400">(Website Development)</span>
               </div>
             </div>
           </div>
