@@ -1,0 +1,14 @@
+{
+  "name": "temer-properties",
+  "version": "1.0.0",
+  "description": "Temer Properties - Real Estate Platform",
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
