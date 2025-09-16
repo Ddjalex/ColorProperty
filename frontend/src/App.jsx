@@ -68,49 +68,27 @@ function App() {
         <div className="min-h-screen bg-background text-foreground">
           <Switch>
             {/* Admin Routes - Protected with Admin Layout */}
-            <Route path="/admin/:rest*">
-              {(params) => (
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Switch>
-                      <Route path="/admin">{() => <Dashboard />}</Route>
-                      <Route path="/admin/dashboard">{() => <Dashboard />}</Route>
-                      <Route path="/admin/properties">{() => <AdminProperties />}</Route>
-                      <Route path="/admin/team">{() => <AdminTeam />}</Route>
-                      <Route path="/admin/blog">{() => <AdminBlog />}</Route>
-                      <Route path="/admin/hero-slides">{() => <AdminHeroSlides />}</Route>
-                      <Route path="/admin/leads">{() => <AdminLeads />}</Route>
-                      <Route path="/admin/settings">{() => <AdminSettings />}</Route>
-                      <Route>{() => <NotFound />}</Route>
-                    </Switch>
-                  </AdminLayout>
-                </ProtectedRoute>
-              )}
-            </Route>
+            <Route path="/admin">{() => <ProtectedRoute><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/dashboard">{() => <ProtectedRoute><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/properties">{() => <ProtectedRoute><AdminLayout><AdminProperties /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/team">{() => <ProtectedRoute><AdminLayout><AdminTeam /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/blog">{() => <ProtectedRoute><AdminLayout><AdminBlog /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/hero-slides">{() => <ProtectedRoute><AdminLayout><AdminHeroSlides /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/leads">{() => <ProtectedRoute><AdminLayout><AdminLeads /></AdminLayout></ProtectedRoute>}</Route>
+            <Route path="/admin/settings">{() => <ProtectedRoute><AdminLayout><AdminSettings /></AdminLayout></ProtectedRoute>}</Route>
             
             {/* Public Routes with Public Layout */}
-            <Route path="/:rest*">
-              {() => (
-                <>
-                  <Header />
-                  <main>
-                    <Switch>
-                      <Route path="/">{() => <Home />}</Route>
-                      <Route path="/properties">{() => <Properties />}</Route>
-                      <Route path="/property/:slug">{(params) => <PropertyDetail {...params} />}</Route>
-                      <Route path="/team">{() => <Team />}</Route>
-                      <Route path="/blog">{() => <Blog />}</Route>
-                      <Route path="/blog/:slug">{(params) => <BlogPost {...params} />}</Route>
-                      <Route path="/contact">{() => <Contact />}</Route>
-                      <Route path="/login">{() => <Login />}</Route>
-                      <Route>{() => <NotFound />}</Route>
-                    </Switch>
-                  </main>
-                  <Footer />
-                  <WhatsAppFloat />
-                </>
-              )}
-            </Route>
+            <Route path="/">{() => <><Header /><main><Home /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/properties">{() => <><Header /><main><Properties /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/property/:slug">{(params) => <><Header /><main><PropertyDetail {...params} /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/team">{() => <><Header /><main><Team /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/blog">{() => <><Header /><main><Blog /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/blog/:slug">{(params) => <><Header /><main><BlogPost {...params} /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/contact">{() => <><Header /><main><Contact /></main><Footer /><WhatsAppFloat /></>}</Route>
+            <Route path="/login">{() => <><Header /><main><Login /></main><Footer /><WhatsAppFloat /></>}</Route>
+            
+            {/* 404 Route */}
+            <Route>{() => <><Header /><main><NotFound /></main><Footer /><WhatsAppFloat /></>}</Route>
           </Switch>
           <Toaster />
         </div>
