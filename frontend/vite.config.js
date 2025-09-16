@@ -17,6 +17,13 @@ export default defineConfig({
     watch: {
       usePolling: true
     },
+    allowedHosts: [
+      'localhost',
+      '127.0.0.1',
+      '0.0.0.0',
+      '.replit.dev',
+      process.env.REPLIT_DEV_DOMAIN
+    ].filter(Boolean),
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
