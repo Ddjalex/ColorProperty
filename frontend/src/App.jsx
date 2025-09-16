@@ -29,8 +29,8 @@ import Footer from '@/components/layout/footer'
 
 // Global fetch function for API calls
 const apiRequest = async (url, options = {}) => {
-  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-  const fullUrl = url.startsWith('/api') ? `${baseURL}${url.replace('/api', '')}` : `${baseURL}${url}`
+  const apiBase = import.meta.env.VITE_API_URL?.trim()
+  const fullUrl = url.startsWith('http') ? url : apiBase ? `${apiBase}${url.startsWith('/') ? '' : '/'}${url}` : url
   
   const response = await fetch(fullUrl, {
     headers: {
