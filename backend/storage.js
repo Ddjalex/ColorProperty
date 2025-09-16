@@ -39,12 +39,16 @@ class MongoStorage {
 
   async createUser(user) {
     const collection = await this.getCollection('users');
-    const hashedPassword = await bcrypt.hash(user.passwordHash, 10);
+    // Use password field if available, fallback to passwordHash, or use empty string  
+    const plainPassword = user.password || user.passwordHash || '';
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
     const newUser = {
       ...user,
       passwordHash: hashedPassword,
       createdAt: new Date()
     };
+    // Remove plain password from stored user
+    delete newUser.password;
     const result = await collection.insertOne(newUser);
     return { ...newUser, _id: result.insertedId.toString() };
   }
