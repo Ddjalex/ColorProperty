@@ -72,8 +72,8 @@ export default function AdminLayout({ children }) {
                 const Icon = item.icon
                 return (
                   <Link key={item.name} href={item.href}>
-                    <a
-                      className={`group flex items-center px-2 py-2 text-base font-medium rounded-md mb-1 ${
+                    <div
+                      className={`group flex items-center px-2 py-2 text-base font-medium rounded-md mb-1 cursor-pointer ${
                         isActiveLink(item.href)
                           ? 'bg-blue-100 text-blue-900'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -81,7 +81,7 @@ export default function AdminLayout({ children }) {
                     >
                       <Icon className="mr-4 h-6 w-6" />
                       {item.name}
-                    </a>
+                    </div>
                   </Link>
                 )
               })}
@@ -120,8 +120,8 @@ export default function AdminLayout({ children }) {
                   const Icon = item.icon
                   return (
                     <Link key={item.name} href={item.href}>
-                      <a
-                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                      <div
+                        className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer ${
                           isActiveLink(item.href)
                             ? 'bg-blue-100 text-blue-900'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -129,7 +129,7 @@ export default function AdminLayout({ children }) {
                       >
                         <Icon className="mr-3 h-5 w-5" />
                         {item.name}
-                      </a>
+                      </div>
                     </Link>
                   )
                 })}
