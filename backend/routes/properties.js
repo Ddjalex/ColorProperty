@@ -14,6 +14,87 @@ router.get('/stats', async (req, res) => {
   }
 });
 
+// Get detailed analytics
+router.get('/analytics', requireAuth, async (req, res) => {
+  try {
+    const [
+      allProperties,
+      activeProperties,
+      soldProperties,
+      rentedProperties,
+      recentProperties
+    ] = await Promise.all([
+      storage.getProperties({ includeAllStatuses: true, limit: 1 }),
+      storage.getProperties({ status: 'active', limit: 1 }),
+      storage.getProperties({ status: 'sold', limit: 1 }),
+      storage.getProperties({ status: 'rented', limit: 1 }),
+      storage.getProperties({ includeAllStatuses: true, limit: 5 }) // Just for recent activity
+    ]);
+
+    // Get ALL properties for comprehensive analytics
+    const allPropertiesData = await storage.getProperties({ 
+      includeAllStatuses: true, 
+      limit: 1000 // Get up to 1000 properties for analytics
+    });
+
+    // Calculate property type distribution from ALL properties
+    const propertyTypes = {};
+    const locations = {};
+    const priceRanges = {
+      'Under 1M': 0,
+      '1M - 5M': 0,
+      '5M - 10M': 0,
+      'Over 10M': 0
+    };
+
+    allPropertiesData.properties.forEach(property => {
+      // Property types
+      const type = property.propertyType || 'Unknown';
+      propertyTypes[type] = (propertyTypes[type] || 0) + 1;
+
+      // Locations
+      const location = property.location || 'Unknown';
+      locations[location] = (locations[location] || 0) + 1;
+
+      // Price ranges
+      const price = property.priceETB || 0;
+      if (price < 1000000) {
+        priceRanges['Under 1M']++;
+      } else if (price < 5000000) {
+        priceRanges['1M - 5M']++;
+      } else if (price < 10000000) {
+        priceRanges['5M - 10M']++;
+      } else {
+        priceRanges['Over 10M']++;
+      }
+    });
+
+    res.json({
+      summary: {
+        total: allProperties.total,
+        active: activeProperties.total,
+        sold: soldProperties.total,
+        rented: rentedProperties.total,
+        availablePercentage: allProperties.total > 0 ? Math.round((activeProperties.total / allProperties.total) * 100) : 0
+      },
+      propertyTypes,
+      locations: Object.entries(locations).slice(0, 5), // Top 5 locations
+      priceRanges,
+      recentProperties: recentProperties.properties.map(p => ({
+        id: p._id,
+        title: p.title,
+        status: p.status,
+        priceETB: p.priceETB,
+        location: p.location,
+        createdAt: p.createdAt
+      }))
+    });
+  } catch (error) {
+    console.error('Analytics error:', error);
+    res.status(500).json({ message: 'Failed to fetch analytics' });
+  }
+});
+
 // Get all properties
 router.get('/', async (req, res) => {
   try {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
-import { Phone, MessageCircle, Settings, Save } from 'lucide-react'
+import { Phone, MessageCircle, Settings, Save, User, Lock, Eye, EyeOff } from 'lucide-react'
 
 export default function AdminSettings() {
   const [formData, setFormData] = useState({
@@ -15,6 +15,24 @@ export default function AdminSettings() {
   
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  // Email and password change states
+  const [showPasswordForm, setShowPasswordForm] = useState(false)
+  const [showEmailForm, setShowEmailForm] = useState(false)
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  })
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+  const [emailData, setEmailData] = useState({
+    newEmail: '',
+    password: ''
+  })
   
   const queryClient = useQueryClient()
 
@@ -73,6 +91,68 @@ export default function AdminSettings() {
     }
   })
 
+  // Change password mutation
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data) => {
+      const token = localStorage.getItem('authToken')
+      const response = await fetch('/api/auth/change-password', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Failed to change password')
+      }
+      
+      return response.json()
+    },
+    onSuccess: () => {
+      alert('Password changed successfully!')
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+      setShowPasswordForm(false)
+      setErrors({})
+    },
+    onError: (error) => {
+      setErrors({ password: error.message })
+    }
+  })
+
+  // Change email mutation
+  const changeEmailMutation = useMutation({
+    mutationFn: async (data) => {
+      const token = localStorage.getItem('authToken')
+      const response = await fetch('/api/auth/change-email', {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Failed to change email')
+      }
+      
+      return response.json()
+    },
+    onSuccess: () => {
+      alert('Email changed successfully!')
+      setEmailData({ newEmail: '', password: '' })
+      setShowEmailForm(false)
+      setErrors({})
+    },
+    onError: (error) => {
+      setErrors({ email: error.message })
+    }
+  })
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
@@ -80,6 +160,55 @@ export default function AdminSettings() {
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
+  }
+
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target
+    setPasswordData(prev => ({ ...prev, [name]: value }))
+    if (errors.password) {
+      setErrors(prev => ({ ...prev, password: '' }))
+    }
+  }
+
+  const handleEmailChange = (e) => {
+    const { name, value } = e.target
+    setEmailData(prev => ({ ...prev, [name]: value }))
+    if (errors.email) {
+      setErrors(prev => ({ ...prev, email: '' }))
+    }
+  }
+
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault()
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setErrors({ password: 'New passwords do not match' })
+      return
+    }
+    if (passwordData.newPassword.length < 6) {
+      setErrors({ password: 'New password must be at least 6 characters long' })
+      return
+    }
+    changePasswordMutation.mutate({
+      currentPassword: passwordData.currentPassword,
+      newPassword: passwordData.newPassword
+    })
+  }
+
+  const handleEmailSubmit = (e) => {
+    e.preventDefault()
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(emailData.newEmail)) {
+      setErrors({ email: 'Please enter a valid email address' })
+      return
+    }
+    changeEmailMutation.mutate({
+      newEmail: emailData.newEmail,
+      password: emailData.password
+    })
+  }
+
+  const togglePasswordVisibility = (field) => {
+    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }))
   }
 
   const validateForm = () => {
@@ -246,6 +375,179 @@ export default function AdminSettings() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="e.g., info@temerproperties.com"
                   />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Admin Account Management */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="h-5 w-5" />
+                Admin Account Management
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Change Email */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Change Email Address</h3>
+                  {!showEmailForm ? (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setShowEmailForm(true)}
+                      className="w-full"
+                    >
+                      <User className="mr-2 h-4 w-4" />
+                      Change Email
+                    </Button>
+                  ) : (
+                    <form onSubmit={handleEmailSubmit} className="space-y-3">
+                      <div>
+                        <input
+                          type="email"
+                          name="newEmail"
+                          value={emailData.newEmail}
+                          onChange={handleEmailChange}
+                          placeholder="New email address"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="password"
+                          name="password"
+                          value={emailData.password}
+                          onChange={handleEmailChange}
+                          placeholder="Current password"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          required
+                        />
+                      </div>
+                      {errors.email && <p className="text-red-600 text-sm">{errors.email}</p>}
+                      <div className="flex gap-2">
+                        <Button 
+                          type="submit" 
+                          size="sm"
+                          disabled={changeEmailMutation.isLoading}
+                          className="flex-1"
+                        >
+                          {changeEmailMutation.isLoading ? 'Updating...' : 'Update Email'}
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setShowEmailForm(false)
+                            setEmailData({ newEmail: '', password: '' })
+                            setErrors({ ...errors, email: '' })
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+
+                {/* Change Password */}
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">Change Password</h3>
+                  {!showPasswordForm ? (
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setShowPasswordForm(true)}
+                      className="w-full"
+                    >
+                      <Lock className="mr-2 h-4 w-4" />
+                      Change Password
+                    </Button>
+                  ) : (
+                    <form onSubmit={handlePasswordSubmit} className="space-y-3">
+                      <div className="relative">
+                        <input
+                          type={showPasswords.current ? "text" : "password"}
+                          name="currentPassword"
+                          value={passwordData.currentPassword}
+                          onChange={handlePasswordChange}
+                          placeholder="Current password"
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility('current')}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showPasswords.new ? "text" : "password"}
+                          name="newPassword"
+                          value={passwordData.newPassword}
+                          onChange={handlePasswordChange}
+                          placeholder="New password"
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility('new')}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showPasswords.confirm ? "text" : "password"}
+                          name="confirmPassword"
+                          value={passwordData.confirmPassword}
+                          onChange={handlePasswordChange}
+                          placeholder="Confirm new password"
+                          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility('confirm')}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      {errors.password && <p className="text-red-600 text-sm">{errors.password}</p>}
+                      <div className="flex gap-2">
+                        <Button 
+                          type="submit" 
+                          size="sm"
+                          disabled={changePasswordMutation.isLoading}
+                          className="flex-1"
+                        >
+                          {changePasswordMutation.isLoading ? 'Updating...' : 'Update Password'}
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setShowPasswordForm(false)
+                            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' })
+                            setErrors({ ...errors, password: '' })
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               </div>
             </CardContent>

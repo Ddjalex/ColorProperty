@@ -10,7 +10,13 @@ import {
   MessageSquare, 
   Settings,
   BarChart3,
-  Plus
+  Plus,
+  TrendingUp,
+  Clock,
+  MapPin,
+  DollarSign,
+  Activity,
+  RefreshCw
 } from 'lucide-react'
 
 export default function Dashboard() {
@@ -21,11 +27,80 @@ export default function Dashboard() {
     blogPosts: 0,
     leads: 0
   })
+  const [analytics, setAnalytics] = useState({
+    summary: {
+      total: 0,
+      active: 0,
+      sold: 0,
+      rented: 0,
+      availablePercentage: 0
+    },
+    propertyTypes: {},
+    locations: [],
+    priceRanges: {},
+    recentProperties: []
+  })
   const [loading, setLoading] = useState(true)
+  const [analyticsLoading, setAnalyticsLoading] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState(new Date())
 
   useEffect(() => {
     fetchStats()
+    fetchAnalytics()
+    
+    // Set up real-time updates every 30 seconds
+    const interval = setInterval(() => {
+      fetchStats()
+      fetchAnalytics()
+    }, 30000)
+    
+    return () => clearInterval(interval)
   }, [])
+
+  const fetchAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('authToken')
+      
+      // Use shared apiRequest helper for consistent API calls
+      const apiRequest = async (url, options = {}) => {
+        const apiBase = import.meta.env.VITE_API_URL?.trim()
+        const fullUrl = url.startsWith('http') ? url : apiBase ? `${apiBase}${url.startsWith('/') ? '' : '/'}${url}` : url
+        
+        const response = await fetch(fullUrl, {
+          headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+          ...options,
+        })
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        return response.json()
+      }
+
+      const data = await apiRequest('/api/properties/analytics', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      setAnalytics(data)
+      setLastUpdated(new Date())
+    } catch (error) {
+      console.error('Failed to fetch analytics:', error)
+    } finally {
+      setAnalyticsLoading(false)
+    }
+  }
+
+  const refreshData = async () => {
+    setLoading(true)
+    setAnalyticsLoading(true)
+    await Promise.all([fetchStats(), fetchAnalytics()])
+  }
 
   const fetchStats = async () => {
     try {
@@ -274,6 +349,242 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Analytics Section */}
+        <div className="space-y-8">
+          {/* Header with Refresh Button */}
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold">Analytics & Insights</h2>
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted-foreground">
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </p>
+              <Button onClick={refreshData} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </div>
+
+          {/* Property Summary Analytics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Active Properties</CardTitle>
+                <TrendingUp className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">{analytics.summary.active}</div>
+                <p className="text-xs text-muted-foreground">
+                  {analytics.summary.availablePercentage}% of total inventory
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Sold Properties</CardTitle>
+                <DollarSign className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-600">{analytics.summary.sold}</div>
+                <p className="text-xs text-muted-foreground">
+                  {analytics.summary.total > 0 ? Math.round((analytics.summary.sold / analytics.summary.total) * 100) : 0}% conversion rate
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Rented Properties</CardTitle>
+                <Home className="h-4 w-4 text-purple-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-purple-600">{analytics.summary.rented}</div>
+                <p className="text-xs text-muted-foreground">
+                  Rental portfolio size
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Portfolio</CardTitle>
+                <BarChart3 className="h-4 w-4 text-gray-600" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{analytics.summary.total}</div>
+                <p className="text-xs text-muted-foreground">
+                  Complete inventory
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Detailed Analytics Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Property Types Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="h-5 w-5" />
+                  Property Types
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {analyticsLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {Object.entries(analytics.propertyTypes).length > 0 ? (
+                      Object.entries(analytics.propertyTypes).map(([type, count]) => (
+                        <div key={type} className="flex justify-between items-center">
+                          <span className="text-sm font-medium capitalize">{type}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-blue-600 h-2 rounded-full" 
+                                style={{ 
+                                  width: `${analytics.summary.total > 0 ? (count / analytics.summary.total) * 100 : 0}%` 
+                                }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-bold min-w-[2rem]">{count}</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4">No property type data available</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Top Locations */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5" />
+                  Top Locations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {analyticsLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {analytics.locations.length > 0 ? (
+                      analytics.locations.map(([location, count]) => (
+                        <div key={location} className="flex justify-between items-center">
+                          <span className="text-sm font-medium">{location}</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 bg-gray-200 rounded-full h-2">
+                              <div 
+                                className="bg-purple-600 h-2 rounded-full" 
+                                style={{ 
+                                  width: `${analytics.summary.total > 0 ? (count / analytics.summary.total) * 100 : 0}%` 
+                                }}
+                              ></div>
+                            </div>
+                            <span className="text-sm font-bold min-w-[2rem]">{count}</span>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4">No location data available</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Price Range Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <DollarSign className="h-5 w-5" />
+                  Price Range Distribution (ETB)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {analyticsLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {Object.entries(analytics.priceRanges).map(([range, count]) => (
+                      <div key={range} className="flex justify-between items-center">
+                        <span className="text-sm font-medium">{range}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-green-600 h-2 rounded-full" 
+                              style={{ 
+                                width: `${analytics.summary.total > 0 ? (count / analytics.summary.total) * 100 : 0}%` 
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-sm font-bold min-w-[2rem]">{count}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Recent Properties Activity */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Recent Activity
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {analyticsLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {analytics.recentProperties.length > 0 ? (
+                      analytics.recentProperties.map((property) => (
+                        <div key={property.id} className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{property.title}</p>
+                            <p className="text-xs text-muted-foreground">{property.location}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              property.status === 'active' ? 'bg-green-100 text-green-800' :
+                              property.status === 'sold' ? 'bg-blue-100 text-blue-800' :
+                              property.status === 'rented' ? 'bg-purple-100 text-purple-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {property.status}
+                            </span>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {property.priceETB ? `${property.priceETB.toLocaleString()} ETB` : 'Price TBD'}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4">No recent activity</p>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
