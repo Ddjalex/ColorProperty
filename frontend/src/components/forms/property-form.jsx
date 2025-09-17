@@ -20,6 +20,8 @@ export default function PropertyForm({ isOpen, property = null, onClose, onSucce
     features: []
   })
   
+  const [uploadingImages, setUploadingImages] = useState(false)
+  
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -91,6 +93,54 @@ export default function PropertyForm({ isOpen, property = null, onClose, onSucce
       features: prev.features.includes(feature)
         ? prev.features.filter(f => f !== feature)
         : [...prev.features, feature]
+    }))
+  }
+
+  const handleImageUpload = async (event) => {
+    const files = Array.from(event.target.files)
+    if (files.length === 0) return
+
+    setUploadingImages(true)
+    const newImages = []
+
+    try {
+      for (const file of files) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+          throw new Error(`${file.name} is not a valid image file`)
+        }
+
+        // Validate file size (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error(`${file.name} is too large. Maximum size is 5MB`)
+        }
+
+        // Convert to base64
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result)
+          reader.onerror = reject
+          reader.readAsDataURL(file)
+        })
+
+        newImages.push(base64)
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        images: [...prev.images, ...newImages]
+      }))
+    } catch (error) {
+      setErrors(prev => ({ ...prev, images: error.message }))
+    } finally {
+      setUploadingImages(false)
+    }
+  }
+
+  const removeImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
     }))
   }
 
@@ -364,6 +414,77 @@ export default function PropertyForm({ isOpen, property = null, onClose, onSucce
                   </label>
                 ))}
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Property Images */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Property Images
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Upload Section */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Upload Images
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    disabled={uploadingImages}
+                    className="hidden"
+                    id="image-upload"
+                  />
+                  <label htmlFor="image-upload" className="cursor-pointer">
+                    <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-sm text-gray-600 mb-2">
+                      {uploadingImages ? 'Uploading...' : 'Click to upload images or drag and drop'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 5MB each
+                    </p>
+                  </label>
+                </div>
+                {errors.images && <p className="text-red-600 text-sm mt-1">{errors.images}</p>}
+              </div>
+
+              {/* Image Preview Grid */}
+              {formData.images.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Uploaded Images ({formData.images.length})
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {formData.images.map((image, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={image}
+                          alt={`Property image ${index + 1}`}
+                          className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                        {index === 0 && (
+                          <div className="absolute bottom-1 left-1">
+                            <Badge className="bg-blue-500 text-white text-xs">Main</Badge>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
