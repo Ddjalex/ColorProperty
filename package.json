@@ -6,9 +6,7 @@
     "build": "cd frontend && npm run build",
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
-    "install:all": "npm run install:backend && npm run install:frontend",
-    "db:push": "cd backend && npx drizzle-kit push",
-    "db:generate": "cd backend && npx drizzle-kit generate"
+    "install:all": "npm run install:backend && npm run install:frontend"
   },
   "engines": {
     "node": ">=18"

@@ -26,7 +26,7 @@ export default function AdminProperties() {
   const queryClient = useQueryClient()
 
   // Fetch properties
-  const { data: properties = [], isLoading, error } = useQuery({
+  const { data: propertiesData = { properties: [], total: 0 }, isLoading, error } = useQuery({
     queryKey: ['/api/properties'],
     queryFn: async () => {
       const response = await fetch('/api/properties')
@@ -34,6 +34,8 @@ export default function AdminProperties() {
       return response.json()
     }
   })
+
+  const properties = propertiesData.properties || []
 
   // Delete property mutation
   const deleteMutation = useMutation({
