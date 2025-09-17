@@ -136,7 +136,8 @@ class MongoStorage {
             priceETB: 1,
             status: 1,
             featured: 1,
-            images: 1,
+            // Only include first image for list view, not all images
+            images: { $slice: 1 },
             amenities: 1,
             coordinates: 1,
             createdAt: 1
@@ -440,7 +441,8 @@ class MongoStorage {
         { $set: updateData },
         { upsert: true, returnDocument: 'after' }
       );
-      return result.value;
+      // Handle both old and new MongoDB driver versions
+      return result.value || result || updateData;
     } catch (error) {
       console.error('Error updating settings:', error);
       throw error;

@@ -55,18 +55,18 @@ export default function Dashboard() {
         return response.json()
       }
 
-      // Fetch data from all endpoints
-      const [properties, heroSlides, team, blog, leads] = await Promise.all([
-        apiRequest('/api/properties'),
-        apiRequest('/api/hero-slides'),
+      // Fetch optimized stats from endpoints
+      const [propertiesStats, heroSlidesStats, team, blog, leads] = await Promise.all([
+        apiRequest('/api/properties/stats'),
+        apiRequest('/api/hero-slides/stats'),
         apiRequest('/api/team'),
         apiRequest('/api/blog'),
         apiRequest('/api/leads', { headers })
       ])
 
       setStats({
-        properties: properties?.total || properties?.length || 0,
-        heroSlides: heroSlides?.length || 0,
+        properties: propertiesStats?.total || 0,
+        heroSlides: heroSlidesStats?.total || 0,
         teamMembers: team?.length || 0,
         blogPosts: blog?.length || 0,
         leads: leads?.length || 0

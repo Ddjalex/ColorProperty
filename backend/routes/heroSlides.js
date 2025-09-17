@@ -4,6 +4,16 @@ const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Get hero slides stats (for dashboard) - optimized
+router.get('/stats', async (req, res) => {
+  try {
+    const slides = await storage.getHeroSlides();
+    res.json({ total: slides.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch hero slides stats' });
+  }
+});
+
 // Get all hero slides
 router.get('/', async (req, res) => {
   try {

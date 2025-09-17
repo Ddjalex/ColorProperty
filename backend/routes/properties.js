@@ -4,6 +4,16 @@ const { requireAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
+// Get properties stats (for dashboard) - optimized  
+router.get('/stats', async (req, res) => {
+  try {
+    const result = await storage.getProperties({ includeAllStatuses: true, limit: 1 });
+    res.json({ total: result.total });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch properties stats' });
+  }
+});
+
 // Get all properties
 router.get('/', async (req, res) => {
   try {
@@ -94,7 +104,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
-// Serve property images
+// Serve property images with optimization
 router.get('/:id/images/:index', async (req, res) => {
   try {
     const property = await storage.getProperty(req.params.id);
@@ -116,9 +126,17 @@ router.get('/:id/images/:index', async (req, res) => {
       
       const buffer = Buffer.from(base64Data, 'base64');
       
+      // Add aggressive caching for images
       res.setHeader('Content-Type', mimeType);
       res.setHeader('Content-Length', buffer.length);
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.setHeader('ETag', `"${req.params.id}-${imageIndex}"`);
+      
+      // Check if client has cached version
+      if (req.headers['if-none-match'] === `"${req.params.id}-${imageIndex}"`) {
+        return res.status(304).end();
+      }
+      
       res.send(buffer);
     } else if (imageData.startsWith('http')) {
       res.redirect(imageData);
