@@ -10,7 +10,9 @@ import {
   Eye, 
   Image,
   MoveUp,
-  MoveDown
+  MoveDown,
+  Upload,
+  X
 } from 'lucide-react'
 
 export default function AdminHeroSlides() {
@@ -207,7 +209,7 @@ export default function AdminHeroSlides() {
   )
 }
 
-// Simple Hero Slide Form Component
+// Hero Slide Form Component with File Upload
 function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     title: slide?.title || '',
@@ -217,13 +219,58 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    setUploadingImage(true)
+    setError('')
+
+    try {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Please select a valid image file')
+      }
+
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('Image size must be less than 5MB')
+      }
+
+      // Convert to base64
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(file)
+      })
+
+      setFormData({ ...formData, imageUrl: base64 })
+    } catch (error) {
+      setError(error.message)
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const removeImage = () => {
+    setFormData({ ...formData, imageUrl: '' })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError('')
 
     try {
       const token = localStorage.getItem('authToken')
+      if (!token) {
+        throw new Error('You must be logged in to save hero slides')
+      }
+
       const url = slide ? `/api/hero-slides/${slide._id}` : '/api/hero-slides'
       const method = slide ? 'PUT' : 'POST'
 
@@ -236,11 +283,15 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
         body: JSON.stringify(formData)
       })
 
-      if (!response.ok) throw new Error('Failed to save hero slide')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || 'Failed to save hero slide')
+      }
 
       onSuccess()
     } catch (error) {
-      alert('Failed to save hero slide: ' + error.message)
+      console.error('Save error:', error)
+      setError('Failed to save hero slide: ' + error.message)
     } finally {
       setIsSubmitting(false)
     }
@@ -250,10 +301,16 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
+      <div className="bg-white rounded-lg max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
         <h2 className="text-xl font-bold mb-4">
           {slide ? 'Edit Hero Slide' : 'Add Hero Slide'}
         </h2>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            {error}
+          </div>
+        )}
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -282,16 +339,49 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Image URL
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Hero Image
             </label>
-            <input
-              type="url"
-              value={formData.imageUrl}
-              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="https://example.com/image.jpg"
-            />
+            
+            {formData.imageUrl ? (
+              <div className="space-y-3">
+                <div className="relative inline-block">
+                  <img
+                    src={formData.imageUrl}
+                    alt="Hero slide preview"
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-sm text-gray-600">Click the X to remove and upload a different image</p>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-sm text-gray-600 mb-2">
+                    {uploadingImage ? 'Uploading...' : 'Click to upload hero image'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG, GIF up to 5MB
+                  </p>
+                </label>
+              </div>
+            )}
           </div>
 
           <div>
@@ -301,7 +391,7 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
             <input
               type="number"
               value={formData.order}
-              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
+              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 1 })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               min="1"
             />
@@ -310,7 +400,7 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
           <div className="flex gap-3 pt-4">
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || uploadingImage}
               className="flex-1"
             >
               {isSubmitting ? 'Saving...' : (slide ? 'Update' : 'Create')}
