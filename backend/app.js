@@ -116,7 +116,7 @@ async function startServer() {
       console.log('Please check your MongoDB connection string');
     }
     
-    app.listen(PORT, '0.0.0.0', () => {
+    app.listen(PORT, 'localhost', () => {
       console.log(`Backend server running on port ${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/health`);
       console.log(`API base URL: http://localhost:${PORT}/api`);
@@ -124,7 +124,7 @@ async function startServer() {
   } catch (error) {
     console.warn('Database connection failed, starting server without database:', error.message);
     
-    app.listen(PORT, '0.0.0.0', () => {
+    app.listen(PORT, 'localhost', () => {
       console.log(`Backend server running on port ${PORT} (without database)`);
       console.log(`Health check: http://localhost:${PORT}/health`);
       console.log(`API base URL: http://localhost:${PORT}/api`);
