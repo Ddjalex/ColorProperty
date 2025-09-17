@@ -39,6 +39,9 @@ async function connectToDatabase() {
 
 async function createIndexes() {
   try {
+    // Users indexes
+    await db.collection('users').createIndex({ email: 1 }, { unique: true });
+    
     // Properties indexes
     await db.collection('properties').createIndex({ slug: 1 }, { unique: true });
     await db.collection('properties').createIndex({ status: 1 });
