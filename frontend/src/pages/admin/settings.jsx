@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { Button } from '../../components/ui/button'
-import { Phone, MessageCircle, Settings, Save, Check } from 'lucide-react'
+import { Phone, MessageCircle, Settings, Save } from 'lucide-react'
 
 export default function AdminSettings() {
   const [formData, setFormData] = useState({
@@ -15,8 +15,6 @@ export default function AdminSettings() {
   
   const [errors, setErrors] = useState({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [autoSaving, setAutoSaving] = useState(false)
-  const [lastSaved, setLastSaved] = useState(null)
   
   const queryClient = useQueryClient()
 
@@ -63,61 +61,17 @@ export default function AdminSettings() {
       
       return response.json()
     },
-    onSuccess: (data, variables, context) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(['/api/settings'])
-      // Only show alert for manual saves, not auto-saves
-      if (!context?.isAutoSave) {
-        alert('Settings updated successfully!')
-      }
-      setLastSaved(new Date())
+      alert('Settings updated successfully!')
     },
     onError: (error) => {
       setErrors({ submit: error.message })
     },
-    onSettled: (data, error, variables, context) => {
-      if (context?.isAutoSave) {
-        setAutoSaving(false)
-      } else {
-        setIsSubmitting(false)
-      }
+    onSettled: () => {
+      setIsSubmitting(false)
     }
   })
-
-  // Auto-save functionality with debouncing
-  const debouncedAutoSave = useCallback(
-    debounce((data) => {
-      setAutoSaving(true)
-      updateMutation.mutate(data, { context: { isAutoSave: true } })
-    }, 2000), // 2 second delay
-    [updateMutation]
-  )
-
-  // Auto-save when form data changes
-  useEffect(() => {
-    if (settings && Object.keys(settings).length > 0) {
-      // Only auto-save if form has been modified from initial settings
-      const hasChanged = Object.keys(formData).some(key => 
-        formData[key] !== (settings[key] || '')
-      )
-      
-      if (hasChanged) {
-        debouncedAutoSave(formData)
-      }
-    }
-  }, [formData, settings, debouncedAutoSave])
-
-  // Debounce utility function
-  function debounce(func, wait) {
-    let timeout
-    return function executedFunction(...args) {
-      const later = () => {
-        clearTimeout(timeout)
-        func(...args)
-      }
-      clearTimeout(timeout)
-      timeout = setTimeout(later, wait)
-    }
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -298,21 +252,7 @@ export default function AdminSettings() {
           </Card>
 
           {/* Save Button */}
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-500">
-              {autoSaving && (
-                <span className="flex items-center">
-                  <div className="animate-spin h-3 w-3 border border-blue-500 border-t-transparent rounded-full mr-2"></div>
-                  Auto-saving...
-                </span>
-              )}
-              {lastSaved && !autoSaving && (
-                <span className="flex items-center text-green-600">
-                  <Check className="mr-1 h-3 w-3" />
-                  Auto-saved {lastSaved.toLocaleTimeString()}
-                </span>
-              )}
-            </div>
+          <div className="flex justify-end">
             <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700">
               <Save className="mr-2 h-4 w-4" />
               {isSubmitting ? 'Saving...' : 'Save Settings'}

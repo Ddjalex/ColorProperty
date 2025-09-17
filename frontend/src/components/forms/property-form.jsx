@@ -31,15 +31,15 @@ export default function PropertyForm({ isOpen, property = null, onClose, onSucce
       setFormData({
         title: property.title || '',
         description: property.description || '',
-        price: property.price || '',
+        price: property.priceETB || '', // Map from backend field
         location: property.location || '',
         propertyType: property.propertyType || 'apartment',
         status: property.status || 'active',
         bedrooms: property.bedrooms || '',
         bathrooms: property.bathrooms || '',
-        size: property.size || '',
+        size: property.sizeSqm || '', // Map from backend field
         images: property.images || [],
-        features: property.features || []
+        features: property.amenities || [] // Map from backend field
       })
     }
   }, [property])
@@ -172,10 +172,11 @@ export default function PropertyForm({ isOpen, property = null, onClose, onSucce
     const submitData = {
       ...formData,
       slug,
-      price: parseFloat(formData.price),
+      priceETB: parseFloat(formData.price), // Map to correct backend field
+      sizeSqm: formData.size ? parseFloat(formData.size) : undefined, // Map to correct backend field
       bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : undefined,
       bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : undefined,
-      size: formData.size ? parseFloat(formData.size) : undefined
+      amenities: formData.features // Map features to amenities
     }
     
     mutation.mutate(submitData)
