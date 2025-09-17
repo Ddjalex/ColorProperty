@@ -36,8 +36,8 @@ app.get('/health', (req, res) => {
 
 // SECURED: Initialize admin user endpoint (only in development mode with secret)
 app.post('/api/init-admin', async (req, res) => {
-  // Security check: Only allow in development mode
-  if (process.env.NODE_ENV !== 'development') {
+  // Security check: Only allow in development mode or when NODE_ENV is not set (Replit environment)
+  if (process.env.NODE_ENV === 'production') {
     return res.status(403).json({ message: 'Admin initialization not allowed in production' });
   }
 
@@ -57,7 +57,9 @@ app.post('/api/init-admin', async (req, res) => {
     const storage = require('./storage');
     const existingAdmin = await storage.getUserByEmail('admin@temer.com');
     if (existingAdmin) {
-      return res.json({ message: 'Admin user already exists' });
+      // Delete existing admin and create new one
+      await storage.deleteUser(existingAdmin._id);
+      console.log('Existing admin user deleted, creating new one...');
     }
 
     // Pass plain password - storage layer will handle hashing
@@ -116,7 +118,7 @@ async function startServer() {
       console.log('Please check your MongoDB connection string');
     }
     
-    app.listen(PORT, 'localhost', () => {
+    app.listen(PORT, () => {
       console.log(`Backend server running on port ${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/health`);
       console.log(`API base URL: http://localhost:${PORT}/api`);
@@ -124,7 +126,7 @@ async function startServer() {
   } catch (error) {
     console.warn('Database connection failed, starting server without database:', error.message);
     
-    app.listen(PORT, 'localhost', () => {
+    app.listen(PORT, () => {
       console.log(`Backend server running on port ${PORT} (without database)`);
       console.log(`Health check: http://localhost:${PORT}/health`);
       console.log(`API base URL: http://localhost:${PORT}/api`);

@@ -284,8 +284,15 @@ function HeroSlideForm({ isOpen, slide, onClose, onSuccess }) {
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to save hero slide')
+        let errorMessage = 'Failed to save hero slide'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.message || errorMessage
+        } catch (parseError) {
+          // If response is not JSON, show response status
+          errorMessage = `Server error: ${response.status} ${response.statusText}`
+        }
+        throw new Error(errorMessage)
       }
 
       onSuccess()
