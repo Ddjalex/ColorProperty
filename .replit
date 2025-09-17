@@ -33,25 +33,25 @@ args = "Frontend"
 name = "Backend"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd backend && npm start"
 waitForPort = 3001
 
-[workflows.workflow.metadata]
-outputType = "console"
-
 [[workflows.workflow]]
 name = "Frontend"
 author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd frontend && npm run dev"
 waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
 
 [agent]
 expertMode = true
@@ -72,6 +72,10 @@ externalPort = 80
 [[ports]]
 localPort = 34217
 externalPort = 4200
+
+[[ports]]
+localPort = 37587
+externalPort = 6000
 
 [[ports]]
 localPort = 38909

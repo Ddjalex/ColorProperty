@@ -35,4 +35,5 @@ vite.config.ts.*
 *.log
 *.tgz
 cpanel-*
-package-json-fix
+package-json-fixbackend/.env
+frontend/.env
