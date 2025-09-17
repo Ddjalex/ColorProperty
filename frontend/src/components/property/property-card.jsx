@@ -34,9 +34,9 @@ export default function PropertyCard({ property }) {
   
   const whatsappMessage = settings?.whatsappTemplate
     ?.replace('{propertyTitle}', property.title)
-    ?.replace('{propertyPrice}', formatCurrency(property.priceETB))
+    ?.replace('{propertyPrice}', formatCurrency(property.price))
     ?.replace('{propertyLink}', propertyUrl) || 
-    `I'm interested in ${property.title} - ${formatCurrency(property.priceETB)}. Property link: ${propertyUrl}`
+    `I'm interested in ${property.title} - ${formatCurrency(property.price)}. Property link: ${propertyUrl}`
   
   // Format WhatsApp number - add Ethiopia country code if not present
   const formatWhatsAppNumber = (number) => {
@@ -101,15 +101,17 @@ export default function PropertyCard({ property }) {
               <span>{property.bathrooms} bath</span>
             </div>
           )}
-          <div className="flex items-center">
-            <Square className="w-4 h-4 mr-1" />
-            <span>{property.sizeSqm} m²</span>
-          </div>
+          {property.size && (
+            <div className="flex items-center">
+              <Square className="w-4 h-4 mr-1" />
+              <span>{property.size} m²</span>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-between mb-4">
           <div className="text-2xl font-bold text-primary" data-testid={`property-price-${property._id}`}>
-            {formatCurrency(property.priceETB)}
+            {formatCurrency(property.price)}
           </div>
         </div>
 
