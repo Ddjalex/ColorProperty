@@ -16,6 +16,7 @@ import {
   Search,
   Filter
 } from 'lucide-react'
+import { getPropertyImageUrl } from '../../lib/utils'
 
 export default function AdminProperties() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -164,11 +165,14 @@ export default function AdminProperties() {
             {filteredProperties.map((property) => (
               <Card key={property._id} className="overflow-hidden">
                 <div className="aspect-video bg-gray-200 relative">
-                  {property.images && property.images[0] ? (
+                  {property.images && property.images.length > 0 ? (
                     <img
-                      src={property.images[0]}
+                      src={getPropertyImageUrl(property._id, 0)}
                       alt={property.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop&auto=format'
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
